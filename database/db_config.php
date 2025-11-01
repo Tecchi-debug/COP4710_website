@@ -2,7 +2,7 @@
 $servername = "localhost";
 $username = "root";
 $password = ""; // blank for XAMPP
-$dbname = "users";
+$dbname = "wnk_project";
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 
