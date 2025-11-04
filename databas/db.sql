@@ -19,13 +19,13 @@ CREATE TABLE IF NOT EXISTS plates (
     FOREIGN KEY (rid) REFERENCES users(uid)
 );
 
-CREATE TABLE IF NOT EXISTS orders(
+CREATE TABLE IF NOT EXISTS orders (
     oid INT AUTO_INCREMENT PRIMARY KEY,
     payer_id INT NOT NULL,
     receiver_id INT NOT NULL,
     total DECIMAL(8,2) NOT NULL,
     FOREIGN KEY (payer_id) REFERENCES users(uid),    
-    FOREIGN KEY (receiver_id_id) REFERENCES users(uid),    
+    FOREIGN KEY (receiver_id_id) REFERENCES users(uid)   
 );
 
 CREATE TABLE IF NOT EXISTS order_item (
