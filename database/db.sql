@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS orders (
     receiver_id INT NOT NULL,
     total DECIMAL(8,2) NOT NULL,
     FOREIGN KEY (payer_id) REFERENCES users(uid),    
-    FOREIGN KEY (receiver_id_id) REFERENCES users(uid)   
+    FOREIGN KEY (receiver_id) REFERENCES users(uid)   
 );
 
 CREATE TABLE IF NOT EXISTS order_item (
