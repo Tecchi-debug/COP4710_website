@@ -39,6 +39,7 @@ COP4710_website/
    - Start Apache and MySQL
 
 2. **Setup Database:**
+   - Create a new database named `wnk_db`
    - Import `database/db.sql` into phpMyAdmin
    - Update database credentials in `backend/api/config/database.php`
 

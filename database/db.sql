@@ -1,3 +1,5 @@
+USE wnk_db;
+
 CREATE TABLE users (
     user_id      BIGINT PRIMARY KEY AUTO_INCREMENT,
     name         VARCHAR(100) NOT NULL,
@@ -34,7 +36,7 @@ CREATE TABLE donors (
 
 CREATE TABLE needys (
     user_id   BIGINT PRIMARY KEY,
-    CONSTRAINT fk_customer_user
+    CONSTRAINT fk_needy_user
         FOREIGN KEY (user_id) REFERENCES users(user_id)
         ON DELETE CASCADE
 );
