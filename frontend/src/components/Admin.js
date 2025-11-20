@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import { setTypeHelper } from '../helper/Admin_helper';
 // Report Form Components
 import { AnnualRestaurantForm, AnnualCustomerForm, AnnualFreePlateForm, AnnualDonationReport } from '../helper/Admin_helper';
 // Member Form Components
-import { GetAllMembers, GetMemberByEmail,  GetMemberByType} from '../helper/Admin_helper';
+import { GetAllMembers, GetMemberByEmail, GetMemberByType } from '../helper/Admin_helper';
 
 /*
 TODO: 
@@ -19,28 +18,76 @@ Obtain member information:
 */
 
 function Admin() {
-    const [reportType, setReportType] = useState('')
-    const [memberType, setMemberType] = useState('')
+    const [reportType, setReportType] = useState('');
+    const [memberType, setMemberType] = useState('');
 
+    // 1. New State: Tracks the user selected for the report
+    const [targetUser, setTargetUser] = useState(null); // { id: 1, name: 'Pizza Place', role: 'restaurant' }
+
+    // Helper to handle dropdown changes
+    const setTypeHelper = (e, setter) => {
+        setter(e.target.value);
+    };
+
+    // 2. Your Maps (Unchanged, but now we will inject props into them)
     const reportFormMap = {
-        "annual-restaurant" : <AnnualRestaurantForm/>,
-        "annual-customer": <AnnualCustomerForm/>,
+        "annual-restaurant": <AnnualRestaurantForm />,
+        "annual-customer": <AnnualCustomerForm />,
         "annual-donor": <AnnualDonationReport />,
         "annual-needy": <AnnualFreePlateForm />
-    }
+    };
 
     const memberFormMap = {
         "find-all": <GetAllMembers />,
         "find-member-type": <GetMemberByType />,
-        "find-email" : <GetMemberByEmail />
-    }
+        "find-email": <GetMemberByEmail />
+    };
 
     return (
         <div>
             <h1>Admin Panel</h1>
-            <p>Welcome to the admin panel.</p>
+            {/* New Section: Feedback on who is selected */}
+
+            <div className="selection-status">
+                <strong>Current Target User: </strong>
+                {targetUser ? (
+                    <span>{targetUser.name} (ID: {targetUser.id})</span>
+                ) : (
+                    <span>None selected. Please find and select a member below first.</span>
+                )}
+            </div>
+
             <section>
-                <h2>Generate Reports</h2>
+                <h2>1. Find & Select Member</h2>
+                <p>Use this section to find a user, then click "Select" in the results to set them as the target.</p>
+                <section className="member-type">
+                    <label htmlFor="member-type">Member Search Method:</label>
+                    <select id="member-type" value={memberType} onChange={(e) => setTypeHelper(e, setMemberType)}>
+                        <option value="">Select a method</option>
+                        <option value="find-all">Get All Members</option>
+                        <option value="find-member-type">Find by Member Type</option>
+                        <option value="find-email">Find by Email or Name</option>
+                    </select>
+                </section>
+                <section className="member-form">
+                    {/* 3. Inject 'onUserSelect' into the member form. 
+                       The member forms must call props.onUserSelect(userObj) when a user is clicked.
+                    */}
+                    {memberType && memberFormMap[memberType] &&
+                        React.cloneElement(memberFormMap[memberType], {
+                            onUserSelect: setTargetUser
+                        })
+                    }
+                </section>
+                <section className="member-table">
+                    
+                </section>
+            </section>
+
+            <hr />
+
+            <section>
+                <h2>2. Generate Reports</h2>
                 <section className="report-type">
                     <label htmlFor="report-type">Report Type:</label>
                     <select id="report-type" value={reportType} onChange={(e) => setTypeHelper(e, setReportType)}>
@@ -52,28 +99,16 @@ function Admin() {
                     </select>
                 </section>
                 <section className="report-form">
-                    {reportFormMap[reportType]}
-                </section>
-                <section className="report-display">
-                    <p>Section will be responsible to display the report for the selected report type after the form is submitted</p>
-                </section>
-            </section>
-            <section>
-                <h2>Member Reports</h2>
-                <section className="member-type">
-                    <label htmlFor="member-type">Member Type:</label>
-                    <select id="member-type" value={memberType} onChange={(e) => setTypeHelper(e, setMemberType)}>
-                        <option value="">Select a member type</option>
-                        <option value="find-all">Get All Members</option>
-                        <option value="find-member-type">Find by Member Type</option>
-                        <option value="find-email">Find by Email</option>
-                    </select>
-                </section>
-                <section className="member-form">
-                    {memberFormMap[memberType]}
-                </section>
-                <section className="member-display">
-                    <p>Section will be responsible to display the member information for the selected member type after the form is submitted</p>
+                    {/* 4. Inject 'targetUser' into the report form.
+                       The report forms can now access props.targetUser.id to run the SQL query.
+                    */}
+                    {reportType && reportFormMap[reportType] ? (
+                        targetUser ? (
+                            React.cloneElement(reportFormMap[reportType], { targetUser })
+                        ) : (
+                            <p>Please select a user in the "Find Member" section above first.</p>
+                        )
+                    ) : null}
                 </section>
             </section>
         </div>
