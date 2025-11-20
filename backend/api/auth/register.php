@@ -1,4 +1,9 @@
 <?php
+
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 require_once '../config/cors.php';
 require_once '../config/database.php';
 
@@ -6,36 +11,107 @@ require_once '../config/database.php';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $input = json_decode(file_get_contents('php://input'), true);
     
-    if (!$input || !isset($input['username']) || !isset($input['password']) || !isset($input['email'])) {
+    // Validate input
+    if (!$input) {
         http_response_code(400);
-        echo json_encode(['error' => 'Missing required fields']);
+        echo json_encode(['error' => 'Invalid input']);
+        exit;
+    } else if (!isset($input['username'])) {
+        http_response_code(400);
+        echo json_encode(['error' => 'username is required']);
+        exit;
+    } else if (!isset($input['password'])) {
+        http_response_code(400);
+        echo json_encode(['error' => 'password is required']);
+        exit;
+    } else if (!isset($input['email'])) {
+        http_response_code(400);
+        echo json_encode(['error' => 'email is required']);
+        exit;
+    } else if (!isset($input['memberType'])) {
+        http_response_code(400);
+        echo json_encode(['error' => 'memberType is required']);
         exit;
     }
     
     $username = $input['username'];
     $password = password_hash($input['password'], PASSWORD_DEFAULT);
     $email = $input['email'];
+    $memberType = $input['memberType'];
+    $address = isset($input['address']) ? $input['address'] : null;
+    $phone = isset($input['phoneNumber']) ? $input['phoneNumber'] : 'N/A';
     
     try {
-        // Use the PDO connection from database.php
-        // $pdo is already available from the included file
-        
-        // Check if user already exists
-        $stmt = $pdo->prepare("SELECT user_id FROM users WHERE name = ? OR email = ?");
+        // Check if user already exists with detailed debugging
+        $stmt = $pdo->prepare("SELECT user_id, name, email FROM users WHERE name = ? OR email = ?");
         $stmt->execute([$username, $email]);
         
-        if ($stmt->fetch()) {
-            http_response_code(409);
-            echo json_encode(['error' => 'User already exists']);
-            exit;
+        $existingUser = $stmt->fetch();
+        if ($existingUser) {
+            // More specific error message
+            if ($existingUser['name'] === $username) {
+                http_response_code(409);
+                echo json_encode(['error' => 'Username already exists']);
+                exit;
+            } else if ($existingUser['email'] === $email) {
+                http_response_code(409);
+                echo json_encode(['error' => 'Email already exists']);
+                exit;
+            }
         }
         
-        // Insert new user
-        $stmt = $pdo->prepare("INSERT INTO users (name, pwd, email) VALUES (?, ?, ?)");
-        $stmt->execute([$username, $password, $email]);
+        // Start transaction to ensure both inserts succeed or both fail
+        $pdo->beginTransaction();
         
-        http_response_code(201);
-        echo json_encode(['message' => 'User registered successfully']);
+        try {
+            // Insert new user - matching your table structure: user_id, name, email, pwd, addr, created_at
+            $stmt = $pdo->prepare("INSERT INTO users (name, email, pwd, addr) VALUES (?, ?, ?, ?)");
+            $stmt->execute([$username, $email, $password, $address]);
+            
+            $userId = $pdo->lastInsertId();
+            
+            // Insert into specific member type table
+            switch ($memberType) {
+                case 'Administrator':
+                    $stmt = $pdo->prepare("INSERT INTO admins (user_id) VALUES (?)");
+                    $stmt->execute([$userId]);
+                    break;
+                    
+                case 'Customer':
+                    $stmt = $pdo->prepare("INSERT INTO customers (user_id, phone, c_card) VALUES (?, ?, ?)");
+                    $stmt->execute([$userId, $phone, null]); // c_card can be added later
+                    break;
+                    
+                case 'Donor':
+                    $stmt = $pdo->prepare("INSERT INTO donors (user_id, phone, c_card) VALUES (?, ?, ?)");
+                    $stmt->execute([$userId, $phone, null]); // c_card can be added later
+                    break;
+                    
+                case 'Needy':
+                    $stmt = $pdo->prepare("INSERT INTO needys (user_id) VALUES (?)");
+                    $stmt->execute([$userId]);
+                    break;
+                    
+                case 'Restaurant':
+                    $stmt = $pdo->prepare("INSERT INTO restaurants (user_id, phone) VALUES (?, ?)");
+                    $stmt->execute([$userId, $phone]);
+                    break;
+                    
+                default:
+                    throw new Exception("Invalid member type: " . $memberType);
+            }
+            
+            // Commit the transaction
+            $pdo->commit();
+            
+            http_response_code(201);
+            echo json_encode(['message' => 'User registered successfully']);
+            
+        } catch (Exception $e) {
+            // Rollback the transaction on error
+            $pdo->rollback();
+            throw $e;
+        }
         
     } catch (PDOException $e) {
         http_response_code(500);

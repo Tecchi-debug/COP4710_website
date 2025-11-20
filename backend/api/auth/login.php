@@ -2,50 +2,66 @@
 require_once '../config/cors.php';
 require_once '../config/database.php';
 
-// API endpoint for user login
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $input = json_decode(file_get_contents('php://input'), true);
-    
-    if (!$input || !isset($input['username']) || !isset($input['password'])) {
-        http_response_code(400);
-        echo json_encode(['error' => 'Missing username or password']);
-        exit;
-    }
     
     $username = $input['username'];
     $password = $input['password'];
     
     try {
-        // Use the PDO connection from database.php
-        // $pdo is already available from the included file
-        
-        // Find user
+        // Get user data
         $stmt = $pdo->prepare("SELECT user_id, name, pwd FROM users WHERE name = ?");
         $stmt->execute([$username]);
-        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        $user = $stmt->fetch();
         
         if ($user && password_verify($password, $user['pwd'])) {
-            // Start session or create JWT token
-            session_start();
-            $_SESSION['user_id'] = $user['user_id'];
-            $_SESSION['username'] = $user['name'];
+            // Determine user type by checking which table contains the user_id
+            $userType = 'User'; // Default
             
-            http_response_code(200);
+            $stmt = $pdo->prepare("SELECT user_id FROM admins WHERE user_id = ?");
+            $stmt->execute([$user['user_id']]);
+            if ($stmt->fetch()) {
+                $userType = 'Administrator';
+            } else {
+                $stmt = $pdo->prepare("SELECT user_id FROM restaurants WHERE user_id = ?");
+                $stmt->execute([$user['user_id']]);
+                if ($stmt->fetch()) {
+                    $userType = 'Restaurant';
+                } else {
+                    $stmt = $pdo->prepare("SELECT user_id FROM customers WHERE user_id = ?");
+                    $stmt->execute([$user['user_id']]);
+                    if ($stmt->fetch()) {
+                        $userType = 'Customer';
+                    } else {
+                        $stmt = $pdo->prepare("SELECT user_id FROM donors WHERE user_id = ?");
+                        $stmt->execute([$user['user_id']]);
+                        if ($stmt->fetch()) {
+                            $userType = 'Donor';
+                        } else {
+                            $stmt = $pdo->prepare("SELECT user_id FROM needys WHERE user_id = ?");
+                            $stmt->execute([$user['user_id']]);
+                            if ($stmt->fetch()) {
+                                $userType = 'Needy';
+                            }
+                        }
+                    }
+                }
+            }
+            
             echo json_encode([
+                'success' => true,
                 'message' => 'Login successful',
-                'user' => [
-                    'id' => $user['user_id'],
-                    'username' => $user['name']
-                ]
+                'user_id' => $user['user_id'],
+                'username' => $user['name'],
+                'user_type' => $userType
             ]);
         } else {
             http_response_code(401);
             echo json_encode(['error' => 'Invalid credentials']);
         }
-        
     } catch (PDOException $e) {
         http_response_code(500);
-        echo json_encode(['error' => 'Database error: ' . $e->getMessage()]);
+        echo json_encode(['error' => 'Database error']);
     }
 } else {
     http_response_code(405);

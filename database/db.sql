@@ -1,6 +1,6 @@
 USE wnk_db;
 
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS users (
     user_id      BIGINT PRIMARY KEY AUTO_INCREMENT,
     name         VARCHAR(100) NOT NULL,
     email        VARCHAR(120) UNIQUE NOT NULL,
@@ -9,14 +9,14 @@ CREATE TABLE users (
     created_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE admins (
+CREATE TABLE IF NOT EXISTS admins (
     user_id BIGINT PRIMARY KEY,
     CONSTRAINT fk_admin_user
         FOREIGN KEY (user_id) REFERENCES users(user_id)
         ON DELETE CASCADE
 );
 
-CREATE TABLE customers (
+CREATE TABLE IF NOT EXISTS customers (
     user_id BIGINT PRIMARY KEY,
     phone   VARCHAR(30),
     c_card  VARCHAR(100),
@@ -25,7 +25,7 @@ CREATE TABLE customers (
         ON DELETE CASCADE
 );
 
-CREATE TABLE donors (
+CREATE TABLE IF NOT EXISTS donors (
     user_id BIGINT PRIMARY KEY,
     phone   VARCHAR(30),
     c_card  VARCHAR(100),
@@ -34,14 +34,14 @@ CREATE TABLE donors (
         ON DELETE CASCADE
 );
 
-CREATE TABLE needys (
+CREATE TABLE IF NOT EXISTS needys (
     user_id   BIGINT PRIMARY KEY,
     CONSTRAINT fk_needy_user
         FOREIGN KEY (user_id) REFERENCES users(user_id)
         ON DELETE CASCADE
 );
 
-CREATE TABLE restaurants (
+CREATE TABLE IF NOT EXISTS restaurants (
     user_id BIGINT PRIMARY KEY,
     phone   VARCHAR(30),
     CONSTRAINT fk_restaurant_user
@@ -49,7 +49,7 @@ CREATE TABLE restaurants (
         ON DELETE CASCADE
 );
 
-CREATE TABLE reports (
+CREATE TABLE IF NOT EXISTS reports (
     report_id    BIGINT PRIMARY KEY AUTO_INCREMENT,
     report_type  VARCHAR(50) NOT NULL,
     report_year  INT,
@@ -57,18 +57,18 @@ CREATE TABLE reports (
     created_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE plates (
+CREATE TABLE IF NOT EXISTS plates (
     plate_id     BIGINT PRIMARY KEY AUTO_INCREMENT,
     description  TEXT,
     name         VARCHAR(120)
 );
 
-CREATE TABLE offers (
+CREATE TABLE IF NOT EXISTS offers (
     offer_id      BIGINT PRIMARY KEY AUTO_INCREMENT,
     restaurant_id BIGINT NOT NULL,
     plate_id      BIGINT NOT NULL,
-    from_time     TIMESTAMP NOT NULL,
-    to_time       TIMESTAMP NOT NULL,
+    from_time     TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    to_time       TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     qty           INT NOT NULL,
     price         DECIMAL(10, 2) NOT NULL,
     CONSTRAINT fk_offer_restaurant
@@ -78,7 +78,7 @@ CREATE TABLE offers (
         ON DELETE RESTRICT
 );
 
-CREATE TABLE reservations (
+CREATE TABLE IF NOT EXISTS reservations (
     reservation_id   BIGINT PRIMARY KEY AUTO_INCREMENT,
     reserved_by_id   BIGINT NOT NULL,  -- customer/donor/needy
     reserved_for_id  BIGINT NULL,      -- for donor → needy cases
@@ -94,7 +94,7 @@ CREATE TABLE reservations (
         ON DELETE RESTRICT
 );
 
-CREATE TABLE user_pickups (
+CREATE TABLE IF NOT EXISTS user_pickups (
     user_id        BIGINT NOT NULL,
     reservation_id BIGINT NOT NULL,
     pickup_time    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
