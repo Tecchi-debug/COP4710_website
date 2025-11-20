@@ -41,6 +41,7 @@ COP4710_website/
 2. **Setup Database:**
    - Create a new database named `wnk_db`
    - Import `database/db.sql` into phpMyAdmin
+   - Import `database/test_data.sql` into phpMyAdmin after to get test data
    - Update database credentials in `backend/api/config/database.php`
 
 3. **Install Frontend Dependencies:**
