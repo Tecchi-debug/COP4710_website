@@ -1,5 +1,10 @@
 import React, { useState } from 'react';
 import { setTypeHelper } from '../helper/Admin_helper';
+// Report Form Components
+import { AnnualRestaurantForm, AnnualCustomerForm, AnnualFreePlateForm, AnnualDonationReport } from '../helper/Admin_helper';
+// Member Form Components
+import { GetAllMembers, GetMemberByEmail,  GetMemberByType} from '../helper/Admin_helper';
+
 /*
 TODO: 
 Four report types:
@@ -16,6 +21,19 @@ Obtain member information:
 function Admin() {
     const [reportType, setReportType] = useState('')
     const [memberType, setMemberType] = useState('')
+
+    const reportFormMap = {
+        "annual-restaurant" : <AnnualRestaurantForm/>,
+        "annual-customer": <AnnualCustomerForm/>,
+        "annual-donor": <AnnualDonationReport />,
+        "annual-needy": <AnnualFreePlateForm />
+    }
+
+    const memberFormMap = {
+        "find-all": <GetAllMembers />,
+        "find-member-type": <GetMemberByType />,
+        "find-email" : <GetMemberByEmail />
+    }
 
     return (
         <div>
@@ -34,8 +52,7 @@ function Admin() {
                     </select>
                 </section>
                 <section className="report-form">
-                    <h2>Section will be responsible to display the form for the selected report type</h2>
-                    <p>Selected report type: {reportType}</p>
+                    {reportFormMap[reportType]}
                 </section>
                 <section className="report-display">
                     <p>Section will be responsible to display the report for the selected report type after the form is submitted</p>
@@ -53,8 +70,7 @@ function Admin() {
                     </select>
                 </section>
                 <section className="member-form">
-                    <h2>Section will be responsible to display the form for the selected member type</h2>
-                    <p>Selected member type: {memberType}</p>
+                    {memberFormMap[memberType]}
                 </section>
                 <section className="member-display">
                     <p>Section will be responsible to display the member information for the selected member type after the form is submitted</p>
