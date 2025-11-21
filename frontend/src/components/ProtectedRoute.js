@@ -1,6 +1,6 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
-import { isAuthenticated, hasRole } from '../utils/auth';
+import { isAuthenticated, hasRole, getUserType } from '../utils/auth';
 
 // Component to protect routes that require authentication
 export const ProtectedRoute = ({ children, requiredRole = null }) => {
@@ -11,7 +11,25 @@ export const ProtectedRoute = ({ children, requiredRole = null }) => {
   }
   
   if (requiredRole && !hasRole(requiredRole)) {
-    return <Navigate to="/" replace />;
+    const currentUserType = getUserType();
+    return (
+      <div className="access-denied-container">
+        <h2 className="access-denied-title">Access Denied</h2>
+        <p className="access-denied-message">
+          You don't have permission to access this page.
+        </p>
+        <p className="access-denied-roles">
+          Required role: <strong>{requiredRole}</strong><br/>
+          Your current role: <strong>{currentUserType || 'Unknown'}</strong>
+        </p>
+        <button 
+          onClick={() => window.history.back()} 
+          className="go-back-button"
+        >
+          Go Back
+        </button>
+      </div>
+    );
   }
   
   return children;

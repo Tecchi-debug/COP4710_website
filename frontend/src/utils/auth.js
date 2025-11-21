@@ -46,7 +46,12 @@ export const getUserSession = () => {
 
 // Check if user is logged in
 export const isAuthenticated = () => {
-  return !!Cookies.get(USER_SESSION_COOKIE);
+  const session = Cookies.get(USER_SESSION_COOKIE);
+  const userType = Cookies.get(USER_TYPE_COOKIE);
+  const userId = Cookies.get(USER_ID_COOKIE);
+  
+  // All required cookies must exist for a valid session
+  return !!(session && userType && userId);
 };
 
 // Check if user has specific role

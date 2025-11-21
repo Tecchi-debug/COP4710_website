@@ -246,3 +246,54 @@ form button {
 form button:hover {
   background: var(--hover_bg);
 }
+
+/* Access Denied Styles */
+.access-denied-container {
+  padding: 40px 20px;
+  text-align: center;
+  background-color: var(--bg);
+  color: var(--text);
+  min-height: 60vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.access-denied-title {
+  color: #ff4444;
+  margin-bottom: 20px;
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+.access-denied-message {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.access-denied-roles {
+  font-size: 16px;
+  color: #ccc;
+  margin-bottom: 30px;
+  line-height: 1.5;
+}
+
+.access-denied-roles strong {
+  color: var(--accent);
+}
+
+.go-back-button {
+  padding: 12px 24px;
+  background: var(--accent);
+  color: var(--text);
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+}
+
+.go-back-button:hover {
+  background: var(--hover_bg);
+}
