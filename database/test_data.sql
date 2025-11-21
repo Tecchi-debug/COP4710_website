@@ -1,3 +1,4 @@
+-- Test data created using a Large Language Model for ease of testing
 USE wnk_db;
 -- 1. Create Base Users (31 Total)
 -- Password 'pass123' is used for everyone for simplicity
