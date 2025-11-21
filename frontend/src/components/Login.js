@@ -45,7 +45,7 @@ function Login() {
           
           switch (userType) {
             case 'Administrator':
-              navigate('/admin-dashboard');
+              navigate('/admin');
               break;
             case 'Restaurant':
               navigate('/restaurant-dashboard');
