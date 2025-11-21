@@ -142,12 +142,11 @@ export function AnnualDonationReport({ targetUser }) {
     )
 }
 
-export function GetAllMembers({ onUserSelect }) {
+export function GetAllMembers({ setMemberList }) {
     const handleSearch = (e) => {
         e.preventDefault();
         console.log("Fetching all members...");
-        // Mock result for demonstration
-        // onUserSelect({ id: 999, name: 'Mock User', role: 'customer' });
+        // TODO: Fetch data from API and call setMemberList(data)
     };
 
     return (
@@ -161,12 +160,13 @@ export function GetAllMembers({ onUserSelect }) {
     )
 }
 
-export function GetMemberByType({ onUserSelect }) {
+export function GetMemberByType({ setMemberList }) {
     const [type, setType] = useState('customers');
 
     const handleSearch = (e) => {
         e.preventDefault();
         console.log(`Fetching members of type: ${type}`);
+        // TODO: Fetch data from API and call setMemberList(data)
     };
 
     return (
@@ -188,12 +188,13 @@ export function GetMemberByType({ onUserSelect }) {
     )
 }
 
-export function GetMemberByEmail({ onUserSelect }) {
+export function GetMemberByEmail({ setMemberList }) {
     const [searchTerm, setSearchTerm] = useState('');
 
     const handleSearch = (e) => {
         e.preventDefault();
         console.log(`Searching for member with email or name: ${searchTerm}`);
+        // TODO: Fetch data from API and call setMemberList(data)
     };
 
     return (

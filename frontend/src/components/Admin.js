@@ -18,6 +18,10 @@ Obtain member information:
 */
 
 function Admin() {
+    // memberList has dummy placeholder data for now
+    const [memberList, setMemberList] = useState([{
+        id: 1, name: "Pizza Place", role: "restaurant"
+    }, { id: 2, name: "Burger Place", role: "restaurant" }, { id: 2, name: "Pasta Place", role: "restaurant" }]);
     const [reportType, setReportType] = useState('');
     const [memberType, setMemberType] = useState('');
 
@@ -70,17 +74,25 @@ function Admin() {
                     </select>
                 </section>
                 <section className="member-form">
-                    {/* 3. Inject 'onUserSelect' into the member form. 
-                       The member forms must call props.onUserSelect(userObj) when a user is clicked.
+                    {/* 3. Inject 'setMemberList' into the member form. 
+                       The member forms must call props.setMemberList(usersArray) when search is performed.
                     */}
                     {memberType && memberFormMap[memberType] &&
                         React.cloneElement(memberFormMap[memberType], {
-                            onUserSelect: setTargetUser
+                            setMemberList: setMemberList
                         })
                     }
                 </section>
                 <section className="member-table">
-                    
+                    <h2>Member List</h2>
+                    <table>
+                        {
+                            // Generate a table that contains all the user
+                            memberList.length > 0 && memberList.map((member) => {
+                                return <UserRow key={member.id} user={member} setTarget={setTargetUser} />
+                            })
+                        }
+                    </table>
                 </section>
             </section>
 
@@ -113,6 +125,22 @@ function Admin() {
             </section>
         </div>
     );
+}
+
+function UserRow({ user, setTarget }) {
+    const { id, name, role } = user
+
+    const updateTargetUser = (e) => {
+        e.preventDefault();
+        setTarget(user);
+    }
+    return (
+        <tr onClick={updateTargetUser} role='button' style={{ cursor: 'pointer' }}>
+            <td>{id}</td>
+            <td>{name}</td>
+            <td>{role}</td>
+        </tr>
+    )
 }
 
 export default Admin;
