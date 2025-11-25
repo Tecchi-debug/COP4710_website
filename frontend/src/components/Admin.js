@@ -19,11 +19,13 @@ Obtain member information:
 
 function Admin() {
     /*memberlist contains the list of members that have been fetched
-        reporttype contains the type of report that can be displayed
-        membertype is the type of searching method for the member */
+        reportType contains the type of report that can be displayed
+        memberType is the type of searching method for the member
+        reportData contains the report data that is going to be stored */
     const [memberList, setMemberList] = useState([]);
     const [reportType, setReportType] = useState('');
     const [memberType, setMemberType] = useState('');
+    const [reportData, setReportData] = useState([]);
 
     // target user for the reports
     const [targetUser, setTargetUser] = useState(null);
@@ -113,17 +115,23 @@ function Admin() {
                     */}
                     {reportType && reportFormMap[reportType] ? (
                         targetUser ? (
-                            React.cloneElement(reportFormMap[reportType], { targetUser })
+                            React.cloneElement(reportFormMap[reportType], { targetUser,setReportData })
                         ) : (
                             <p>Please select a user in the "Find Member" section above first.</p>
                         )
                     ) : null}
+                </section>
+                <section className="report-table">
+                    {
+                        reportData.length > 0 && reportData.map((entry) => ReportRow(entry))
+                    }
                 </section>
             </section>
         </div>
     );
 }
 
+// Object responsible for rendering the users
 function UserRow({ user, setTarget }) {
     const { user_id, name, role } = user
 
@@ -140,4 +148,16 @@ function UserRow({ user, setTarget }) {
     )
 }
 
+// Object responsible to render the data received
+function ReportRow({data}) {
+    return (
+        <tr>
+            {
+                Object.entries(data).map(([key, value]) => {
+                    <td key={key}>{value.toString()}</td>
+                })
+            }
+        </tr>
+    )
+}
 export default Admin;
