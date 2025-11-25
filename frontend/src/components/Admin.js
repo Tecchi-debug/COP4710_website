@@ -123,7 +123,7 @@ function Admin() {
                 </section>
                 <section className="report-table">
                     {
-                        reportData.length > 0 && reportData.map((entry) => ReportRow(entry))
+                        reportData.length > 0 && reportData.map((entry) => <ReportRow data={entry} />)
                     }
                 </section>
             </section>
@@ -154,7 +154,7 @@ function ReportRow({data}) {
         <tr>
             {
                 Object.entries(data).map(([key, value]) => {
-                    <td key={key}>{value.toString()}</td>
+                    return <td key={key}>{value.toString()}</td>
                 })
             }
         </tr>
