@@ -227,7 +227,25 @@ export function GetMemberByEmail({ setMemberList }) {
     const handleSearch = (e) => {
         e.preventDefault();
         console.log(`Searching for member with email or name: ${searchTerm}`);
-        // TODO: Fetch data from API and call setMemberList(data)
+        fetch("http://localhost/cop4710_website/backend/api/admin/search/term.php", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({email:searchTerm})
+        }).then((response) => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then((data) => {
+                console.log(data);
+                setMemberList(data);
+            })
+            .catch((error) => {
+                console.error('Error fetching members:', error);
+            });
     };
 
     return (
@@ -237,7 +255,7 @@ export function GetMemberByEmail({ setMemberList }) {
                 <label>
                     Search:
                     <input
-                        type="text"
+                        type="email"
                         placeholder="Enter email or name"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
