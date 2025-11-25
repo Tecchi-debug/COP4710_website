@@ -67,7 +67,7 @@ function Admin() {
                         <option value="">Select a method</option>
                         <option value="find-all">Get All Members</option>
                         <option value="find-member-type">Find by Member Type</option>
-                        <option value="find-email">Find by Email or Name</option>
+                        <option value="find-email">Find by Email</option>
                     </select>
                 </section>
                 <section className="member-form">

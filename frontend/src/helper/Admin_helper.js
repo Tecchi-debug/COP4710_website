@@ -181,7 +181,25 @@ export function GetMemberByType({ setMemberList }) {
     const handleSearch = (e) => {
         e.preventDefault();
         console.log(`Fetching members of type: ${type}`);
-        // TODO: Fetch data from API and call setMemberList(data)
+        fetch("http://localhost/cop4710_website/backend/api/admin/search/type.php", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({type:type})
+        }).then((response) => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then((data) => {
+                console.log(data);
+                setMemberList(data);
+            })
+            .catch((error) => {
+                console.error('Error fetching members:', error);
+            });
     };
 
     return (
@@ -193,7 +211,7 @@ export function GetMemberByType({ setMemberList }) {
                     <select value={type} onChange={(e) => setType(e.target.value)}>
                         <option value="customers">Customers</option>
                         <option value="donors">Donors</option>
-                        <option value="needys">Needys</option>
+                        <option value="needy">Needys</option>
                         <option value="restaurants">Restaurants</option>
                     </select>
                 </label>
@@ -214,7 +232,7 @@ export function GetMemberByEmail({ setMemberList }) {
 
     return (
         <div className="member-search-form">
-            <h3>Find Member by Email or Name</h3>
+            <h3>Find Member by Email</h3>
             <form onSubmit={handleSearch}>
                 <label>
                     Search:
