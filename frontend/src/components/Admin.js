@@ -18,22 +18,21 @@ Obtain member information:
 */
 
 function Admin() {
-    // memberList has dummy placeholder data for now
-    const [memberList, setMemberList] = useState([{
-        id: 1, name: "Pizza Place", role: "restaurant"
-    }, { id: 2, name: "Burger Place", role: "restaurant" }, { id: 2, name: "Pasta Place", role: "restaurant" }]);
+    /*memberlist contains the list of members that have been fetched
+        reporttype contains the type of report that can be displayed
+        membertype is the type of searching method for the member */
+    const [memberList, setMemberList] = useState([]);
     const [reportType, setReportType] = useState('');
     const [memberType, setMemberType] = useState('');
 
-    // 1. New State: Tracks the user selected for the report
-    const [targetUser, setTargetUser] = useState(null); // { id: 1, name: 'Pizza Place', role: 'restaurant' }
+    // target user for the reports
+    const [targetUser, setTargetUser] = useState(null);
 
     // Helper to handle dropdown changes
     const setTypeHelper = (e, setter) => {
         setter(e.target.value);
     };
 
-    // 2. Your Maps (Unchanged, but now we will inject props into them)
     const reportFormMap = {
         "annual-restaurant": <AnnualRestaurantForm />,
         "annual-customer": <AnnualCustomerForm />,
@@ -50,12 +49,10 @@ function Admin() {
     return (
         <div>
             <h1>Admin Panel</h1>
-            {/* New Section: Feedback on who is selected */}
-
             <div className="selection-status">
                 <strong>Current Target User: </strong>
                 {targetUser ? (
-                    <span>{targetUser.name} (ID: {targetUser.id})</span>
+                    <span>{targetUser.name} (ID: {targetUser.user_id})</span>
                 ) : (
                     <span>None selected. Please find and select a member below first.</span>
                 )}
@@ -89,7 +86,7 @@ function Admin() {
                         {
                             // Generate a table that contains all the user
                             memberList.length > 0 && memberList.map((member) => {
-                                return <UserRow key={member.id} user={member} setTarget={setTargetUser} />
+                                return <UserRow key={member.user_id} user={member} setTarget={setTargetUser} />
                             })
                         }
                     </table>
@@ -128,7 +125,7 @@ function Admin() {
 }
 
 function UserRow({ user, setTarget }) {
-    const { id, name, role } = user
+    const { user_id, name, role } = user
 
     const updateTargetUser = (e) => {
         e.preventDefault();
@@ -136,7 +133,7 @@ function UserRow({ user, setTarget }) {
     }
     return (
         <tr onClick={updateTargetUser} role='button' style={{ cursor: 'pointer' }}>
-            <td>{id}</td>
+            <td>{user_id}</td>
             <td>{name}</td>
             <td>{role}</td>
         </tr>

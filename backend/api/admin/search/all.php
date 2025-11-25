@@ -1,12 +1,10 @@
-<?php 
-require_once '../config/cors.php';
-require_once '../config/database.php';
+<?php
+require_once '../../config/cors.php';
+require_once '../../config/database.php';
 
-if($_SERVER['REQUEST_METHOD'] === 'POST') {
-
-    $stmt = $pdo->prepare(
-    <<<EOT
-    SELECT u.user_id, u.name, u.email, u.addr,
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $stmt = $pdo->query(<<<EOT
+    SELECT u.user_id, u.name, u.email,
     CASE 
         WHEN r.user_id IS NOT NULL THEN 'restaurant'
         WHEN c.user_id IS NOT NULL THEN 'customer'
@@ -25,7 +23,10 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
         OR n.user_id IS NOT NULL
     ORDER BY role ASC;
 EOT);
-    $stmt->execute();
+    $results = $stmt->fetchall(PDO::FETCH_OBJ);
+
+    header('Content-Type: application/json');
+    echo json_encode($results);
 }
-    
+
 ?>

@@ -146,7 +146,22 @@ export function GetAllMembers({ setMemberList }) {
     const handleSearch = (e) => {
         e.preventDefault();
         console.log("Fetching all members...");
-        // TODO: Fetch data from API and call setMemberList(data)
+        fetch("http://localhost/cop4710_website/backend/api/admin/search/all.php", {
+            method: 'POST',
+        })
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then((data) => {
+                console.log(data);
+                setMemberList(data);
+            })
+            .catch((error) => {
+                console.error('Error fetching members:', error);
+            });
     };
 
     return (
