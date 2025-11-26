@@ -1,7 +1,7 @@
 // File for any helper functions/ components needed for admin panel
 import React, { useState } from 'react';
 
-export function AnnualRestaurantForm({ targetUser }) {
+export function AnnualRestaurantForm({ targetUser,setReportData }) {
     const [year, setYear] = useState(new Date().getFullYear());
 
     const handleSubmit = (e) => {
@@ -37,7 +37,7 @@ export function AnnualRestaurantForm({ targetUser }) {
     )
 }
 
-export function AnnualCustomerForm({ targetUser }) {
+export function AnnualCustomerForm({ targetUser,setReportData }) {
     const [year, setYear] = useState(new Date().getFullYear());
 
     const handleSubmit = (e) => {
@@ -72,7 +72,7 @@ export function AnnualCustomerForm({ targetUser }) {
     )
 }
 
-export function AnnualFreePlateForm({ targetUser }) {
+export function AnnualFreePlateForm({ targetUser,setReportData }) {
     const [year, setYear] = useState(new Date().getFullYear());
 
     const handleSubmit = (e) => {
