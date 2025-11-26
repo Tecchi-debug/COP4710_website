@@ -1,13 +1,31 @@
 // File for any helper functions/ components needed for admin panel
 import React, { useState } from 'react';
 
-export function AnnualRestaurantForm({ targetUser,setReportData }) {
+export function AnnualRestaurantForm({ targetUser, setReportData }) {
     const [year, setYear] = useState(new Date().getFullYear());
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        // Placeholder for report generation logic
-        console.log(`Generating Annual Activity Report for Restaurant: ${targetUser?.name} (ID: ${targetUser?.id}) for year ${year}`);
+        fetch("http://localhost/cop4710_website/backend/api/admin/reports/restaurant.php",
+            {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ year: year, user_id: targetUser.user_id, role: targetUser.role })
+            }).then((response) => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then((data) => {
+                console.log(data);
+                setReportData(data.report_data);
+            })
+            .catch((error) => {
+                console.error('Error generating report:', error);
+            });
     };
 
     return (
@@ -37,7 +55,7 @@ export function AnnualRestaurantForm({ targetUser,setReportData }) {
     )
 }
 
-export function AnnualCustomerForm({ targetUser,setReportData }) {
+export function AnnualCustomerForm({ targetUser, setReportData }) {
     const [year, setYear] = useState(new Date().getFullYear());
 
     const handleSubmit = (e) => {
@@ -72,12 +90,31 @@ export function AnnualCustomerForm({ targetUser,setReportData }) {
     )
 }
 
-export function AnnualFreePlateForm({ targetUser,setReportData }) {
+export function AnnualFreePlateForm({ targetUser, setReportData }) {
     const [year, setYear] = useState(new Date().getFullYear());
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        console.log(`Generating Annual Free Plate Report for Needy: ${targetUser?.name} (ID: ${targetUser?.id}) for year ${year}`);
+        fetch("http://localhost/cop4710_website/backend/api/admin/reports/needy.php",
+            {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ year: year, user_id: targetUser.user_id, role: targetUser.role })
+            }).then((response) => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then((data) => {
+                console.log(data);
+                setReportData(data.report_data);
+            })
+            .catch((error) => {
+                console.error('Error generating report:', error);
+            });
     };
 
     return (
@@ -186,13 +223,13 @@ export function GetMemberByType({ setMemberList }) {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({type:type})
+            body: JSON.stringify({ type: type })
         }).then((response) => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
             .then((data) => {
                 console.log(data);
                 setMemberList(data);
@@ -232,13 +269,13 @@ export function GetMemberByEmail({ setMemberList }) {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({email:searchTerm})
+            body: JSON.stringify({ email: searchTerm })
         }).then((response) => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
             .then((data) => {
                 console.log(data);
                 setMemberList(data);

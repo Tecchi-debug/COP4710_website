@@ -122,9 +122,19 @@ function Admin() {
                     ) : null}
                 </section>
                 <section className="report-table">
-                    {
-                        reportData.length > 0 && reportData.map((entry) => <ReportRow data={entry} />)
-                    }
+                    <table>
+                        <thead>
+                            {
+                                // Render the table header with the header elements
+                                reportData.length > 0 && <ReportHeader data={reportData[0]} />
+                            }
+                        </thead>
+                        <tbody>
+                            {
+                                reportData.length > 0 && reportData.map((entry) => <ReportRow data={entry} />)
+                            }
+                        </tbody>
+                    </table>
                 </section>
             </section>
         </div>
@@ -155,6 +165,21 @@ function ReportRow({data}) {
             {
                 Object.entries(data).map(([key, value]) => {
                     return <td key={key}>{value.toString()}</td>
+                })
+            }
+        </tr>
+    )
+}
+
+function ReportHeader({data}) {
+    return (
+        <tr>
+            {
+                Object.entries(data).map(([key, value]) => {
+                    let cleanedString = key.split('_')
+                    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+                    .join(' ');
+                    return <th scope='col'>{cleanedString}</th>
                 })
             }
         </tr>
