@@ -60,7 +60,26 @@ export function AnnualCustomerForm({ targetUser, setReportData }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        console.log(`Generating Annual Purchase Report for User: ${targetUser?.name} (ID: ${targetUser?.id}) for year ${year}`);
+        fetch("http://localhost/cop4710_website/backend/api/admin/reports/customer.php",
+            {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ year: year, user_id: targetUser.user_id, role: targetUser.role })
+            }).then((response) => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then((data) => {
+                console.log(data);
+                setReportData(data.report_data);
+            })
+            .catch((error) => {
+                console.error('Error generating report:', error);
+            });
     };
 
     return (
@@ -144,12 +163,31 @@ export function AnnualFreePlateForm({ targetUser, setReportData }) {
     )
 }
 
-export function AnnualDonationReport({ targetUser }) {
+export function AnnualDonationReport({ targetUser, setReportData }) {
     const [year, setYear] = useState(new Date().getFullYear());
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        console.log(`Generating Tax Donation Report for Donor: ${targetUser?.name} (ID: ${targetUser?.id}) for year ${year}`);
+        fetch("http://localhost/cop4710_website/backend/api/admin/reports/donation.php",
+            {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ year: year, user_id: targetUser.user_id, role: targetUser.role })
+            }).then((response) => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then((data) => {
+                console.log(data);
+                setReportData(data.report_data);
+            })
+            .catch((error) => {
+                console.error('Error generating report:', error);
+            });
     };
 
     return (
