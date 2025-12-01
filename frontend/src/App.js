@@ -6,6 +6,7 @@ import Nav from './components/Nav';
 import Home from './components/Home';
 import Login from './components/Login';
 import Register from './components/Register';
+import Profile from './components/Profile';
 import Restaurants from './components/Restaurants';
 import Admin from './components/Admin';
 import CustomerDashboard from "./components/CustomerDashboard";
@@ -23,6 +24,14 @@ return (
                     <Route path="/" element={<Home />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/register" element={<Register />} />
+                    <Route 
+                        path="/profile" 
+                        element={
+                            <ProtectedRoute>
+                                <Profile />
+                            </ProtectedRoute>
+                        } 
+                    />
                     <Route 
                         path="/restaurants" 
                         element={

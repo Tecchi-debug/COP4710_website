@@ -41,7 +41,9 @@ function Nav() {
     <nav className="nav-container">
       <div className="nav-left">
         <Link to="/">Home</Link>
-        <Link to="/restaurants">Restaurants</Link>
+        {isAuthenticated && getUserType() === 'Restaurant' && (
+          <Link to="/Restaurants">Make Offers</Link>
+        )}
         {isAuthenticated && getUserType() === 'Administrator' && (
           <Link to="/admin">Admin</Link>
         )}
