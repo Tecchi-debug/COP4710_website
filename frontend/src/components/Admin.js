@@ -45,7 +45,7 @@ function Admin() {
             <div className="selection-status">
                 <strong>Current Target User: </strong>
                 {targetUser ? (
-                    <span>{targetUser.name} (ID: {targetUser.user_id})</span>
+                    <span>{targetUser.name}</span>
                 ) : (
                     <span>None selected. Please find and select a member below first.</span>
                 )}
