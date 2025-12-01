@@ -40,6 +40,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $memberType = $input['memberType'];
     $address = isset($input['address']) ? $input['address'] : null;
     $phone = isset($input['phoneNumber']) ? $input['phoneNumber'] : 'N/A';
+    $creditCard = $input['creditCard'] : 'N/A';
+
+    // Validate based on type
+    if (in_array($memberType, ['Customer', 'Donor'])){
+        if (!$creditCard) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Credit card required for Customers and Donors']);
+            exit;
+        }
+    }
     
     try {
         // Check if user already exists with detailed debugging
@@ -79,12 +89,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     
                 case 'Customer':
                     $stmt = $pdo->prepare("INSERT INTO customers (user_id, phone, c_card) VALUES (?, ?, ?)");
-                    $stmt->execute([$userId, $phone, null]); // c_card can be added later
+                    $stmt->execute([$userId, $phone, $creditCard]);
                     break;
                     
                 case 'Donor':
                     $stmt = $pdo->prepare("INSERT INTO donors (user_id, phone, c_card) VALUES (?, ?, ?)");
-                    $stmt->execute([$userId, $phone, null]); // c_card can be added later
+                    $stmt->execute([$userId, $phone, $creditCard]);
                     break;
                     
                 case 'Needy':
