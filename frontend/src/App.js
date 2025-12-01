@@ -37,6 +37,14 @@ return (
                             </ProtectedRoute>
                         } 
                     />
+                    <Route
+                        path="/customer"
+                        element={
+                            <ProtectedRoute>
+                                <CustomerDashboard />
+                            </ProtectedRoute>
+                        }
+                    />
                 </Routes>
             </div>
         </Router>
