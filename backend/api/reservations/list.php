@@ -12,35 +12,72 @@ if (!isset($_GET['user_id'])) {
 $user_id = intval($_GET['user_id']);
 
 try {
-    // Ensure the user_id corresponds to a customer
-    $stmt = $pdo->prepare("SELECT user_id FROM customers WHERE user_id = ?");
-    $stmt->execute([$user_id]);
-    $isCustomer = $stmt->fetch(PDO::FETCH_ASSOC);
+    // Determine user role (customer, donor, needy)
+    $role = null;
 
-    if (!$isCustomer) {
+    $roleTables = [
+        "customer" => "customers",
+        "donor" => "donors",
+        "needy" => "needys"
+    ];
+
+    foreach ($roleTables as $key => $table) {
+        $stmt = $pdo->prepare("SELECT user_id FROM $table WHERE user_id = ?");
+        $stmt->execute([$user_id]);
+        if ($stmt->fetch(PDO::FETCH_ASSOC)) {
+            $role = $key;
+            break;
+        }
+    }
+
+    if ($role === null) {
         http_response_code(403);
-        echo json_encode(['success' => false, 'error' => 'User is not a customer']);
+        echo json_encode(['success' => false, 'error' => 'User has no valid role']);
         exit;
     }
 
-    // Query reservations for this user
-    $sql = "
-        SELECT
-            r.reservation_id,
-            p.name AS offer_title,
-            o.price AS offer_price,
-            r.qty AS quantity,
-            r.status,
-            u.name AS restaurant_name,
-            o.offer_id
-        FROM reservations r
-        JOIN offers o ON r.offer_id = o.offer_id
-        JOIN plates p ON o.plate_id = p.plate_id
-        JOIN restaurants rest ON o.restaurant_id = rest.user_id
-        JOIN users u ON rest.user_id = u.user_id
-        WHERE r.reserved_by_id = ?
-        ORDER BY r.reservation_id DESC
-    ";
+    // Build SQL depending on role
+    if ($role === "needy") {
+        // Needy users see reservations where they are the recipient
+        $sql = "
+            SELECT
+                r.reservation_id,
+                p.name AS plate_name,
+                o.price AS price,
+                r.qty AS qty,
+                r.status,
+                restu.name AS restaurant_name,
+                o.offer_id
+            FROM reservations r
+            JOIN offers o ON r.offer_id = o.offer_id
+            JOIN plates p ON o.plate_id = p.plate_id
+            JOIN restaurants rest on o.restaurant id = rest.user_id
+            JOIN users restu ON rest.user_id = restu.user_id
+            WHERE r.reserved_for_id = ?
+            ORDER BY r.reservation_id DESC
+        ";
+        $params = [$user_id];
+    } else {
+        // Customer or donor sees their own reservations
+        $sql = "
+            SELECT
+                r.reservation_id,
+                p.name AS plate_name,
+                o.price AS price,
+                r.qty AS qty,
+                r.status,
+                restu.name AS restaurant_name,
+                o.offer_id
+            FROM reservations r
+            JOIN offers o ON r.offer_id = o.offer_id
+            JOIN plates p ON o.plate_id = p.plate_id
+            JOIN restaurants rest ON o.restaurant_id = rest.user_id
+            JOIN users restu ON rest.user_id = restu.user_id
+            WHERE r.reserved_by_id = ?
+            ORDER BY r.reservation_id DESC
+        ";
+        $params = [$user_id];
+    }
 
     $stmt = $pdo->prepare($sql);
     $stmt->execute([$user_id]);
@@ -49,6 +86,7 @@ try {
     echo json_encode([
         'success' => true,
         'reservations' => $reservations
+        'role' => $role
     ]);
 
 } catch (PDOException $e) {
