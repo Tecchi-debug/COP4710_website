@@ -9,6 +9,8 @@ import Register from './components/Register';
 import Restaurants from './components/Restaurants';
 import Admin from './components/Admin';
 import CustomerDashboard from "./components/CustomerDashboard";
+import DonorDashboard from "./components/DonorDashboard";
+import NeedyDashboard from "./components/NeedyDashboard";
 import './App.css';
 
 function App() {
@@ -42,6 +44,22 @@ return (
                         element={
                             <ProtectedRoute>
                                 <CustomerDashboard />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/donor"
+                        element={
+                            <ProtectedRoute>
+                                <DonorDashboard />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/needy"
+                        element={
+                            <ProtectedRoute>
+                                <NeedyDashboard />
                             </ProtectedRoute>
                         }
                     />
