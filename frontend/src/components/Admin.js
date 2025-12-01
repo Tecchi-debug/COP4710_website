@@ -19,11 +19,9 @@ Obtain member information:
 
 function Admin() {
     /*memberlist contains the list of members that have been fetched
-        reportType contains the type of report that can be displayed
         memberType is the type of searching method for the member
         reportData contains the report data that is going to be stored */
     const [memberList, setMemberList] = useState([]);
-    const [reportType, setReportType] = useState('');
     const [memberType, setMemberType] = useState('');
     const [reportData, setReportData] = useState([]);
 
@@ -33,13 +31,6 @@ function Admin() {
     // Helper to handle dropdown changes
     const setTypeHelper = (e, setter) => {
         setter(e.target.value);
-    };
-
-    const reportFormMap = {
-        "annual-restaurant": <AnnualRestaurantForm />,
-        "annual-customer": <AnnualCustomerForm />,
-        "annual-donor": <AnnualDonationReport />,
-        "annual-needy": <AnnualFreePlateForm />
     };
 
     const memberFormMap = {
@@ -99,27 +90,17 @@ function Admin() {
 
             <section>
                 <h2>2. Generate Reports</h2>
-                <section className="report-type">
-                    <label htmlFor="report-type">Report Type:</label>
-                    <select id="report-type" value={reportType} onChange={(e) => setTypeHelper(e, setReportType)}>
-                        <option value="">Select a report type</option>
-                        <option value="annual-restaurant">Restaurant Annual Report</option>
-                        <option value="annual-customer">Customer Annual Report</option>
-                        <option value="annual-donor">Year-end Donation Report</option>
-                        <option value="annual-needy">Annual Free Plate Report</option>
-                    </select>
-                </section>
                 <section className="report-form">
-                    {/* 4. Inject 'targetUser' into the report form.
-                       The report forms can now access props.targetUser.id to run the SQL query.
-                    */}
-                    {reportType && reportFormMap[reportType] ? (
-                        targetUser ? (
-                            React.cloneElement(reportFormMap[reportType], { targetUser,setReportData })
-                        ) : (
-                            <p>Please select a user in the "Find Member" section above first.</p>
-                        )
-                    ) : null}
+                    {targetUser ? (
+                        <>
+                            {targetUser.role === 'restaurant' && <AnnualRestaurantForm targetUser={targetUser} setReportData={setReportData} />}
+                            {targetUser.role === 'customer' && <AnnualCustomerForm targetUser={targetUser} setReportData={setReportData} />}
+                            {targetUser.role === 'donor' && <AnnualDonationReport targetUser={targetUser} setReportData={setReportData} />}
+                            {targetUser.role === 'needy' && <AnnualFreePlateForm targetUser={targetUser} setReportData={setReportData} />}
+                        </>
+                    ) : (
+                        <p>Please select a user in the "Find Member" section above first.</p>
+                    )}
                 </section>
                 <section className="report-table">
                     <table>
@@ -159,7 +140,7 @@ function UserRow({ user, setTarget }) {
 }
 
 // Object responsible to render the data received
-function ReportRow({data}) {
+function ReportRow({ data }) {
     return (
         <tr>
             {
@@ -171,14 +152,14 @@ function ReportRow({data}) {
     )
 }
 
-function ReportHeader({data}) {
+function ReportHeader({ data }) {
     return (
         <tr>
             {
                 Object.entries(data).map(([key, value]) => {
                     let cleanedString = key.split('_')
-                    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-                    .join(' ');
+                        .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+                        .join(' ');
                     return <th scope='col'>{cleanedString}</th>
                 })
             }
