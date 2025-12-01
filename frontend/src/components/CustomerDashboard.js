@@ -126,7 +126,7 @@ function CustomerDashboard() {
               }}
             >
               <h3>{offer.plate_name}</h3>
-              <p>{offer.description}</p>
+              <p>{offer.plate_description}</p>
               <p><strong>Price:</strong> ${offer.price}</p>
               <p><strong>Qty left:</strong> {offer.qty}</p>
               <button onClick={() => reserveOffer(offer.offer_id)}>Reserve</button>
