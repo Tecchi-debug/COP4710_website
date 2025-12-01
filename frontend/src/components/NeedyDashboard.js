@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useContext } from "react";
-import { AuthContext } from "../contexts/AuthContext";
+import { useAuth } from "../contexts/AuthContext";
 
 const NeedyDashboard = () => {
-  const { user } = useContext(AuthContext); // current logged-in needy user
+  const { user } = useAuth(); // current logged-in needy user
   const [freePlates, setFreePlates] = useState([]);
   const [selectedPlates, setSelectedPlates] = useState([]);
   const [loading, setLoading] = useState(false);

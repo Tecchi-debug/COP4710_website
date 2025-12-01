@@ -23,15 +23,15 @@ function Nav() {
     const userType = getUserType();
     switch (userType) {
       case 'Administrator':
-        return '/admin-dashboard';
+        return '/A';
       case 'Restaurant':
-        return '/restaurant-dashboard';
+        return '/RestaurantDashboard';
       case 'Customer':
-        return '/customer-dashboard';
+        return '/CustomerDashboard';
       case 'Donor':
-        return '/donor-dashboard';
+        return '/DonorDashboard';
       case 'Needy':
-        return '/needy-dashboard';
+        return '/NeedyDashboard';
       default:
         return '/';
     }

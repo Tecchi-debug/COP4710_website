@@ -8,6 +8,7 @@ function Register() {
   const [memberType, setMemberType] = useState('Restaurant');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [address, setAddress] = useState('');
+  const [creditCard, setCreditCard] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 

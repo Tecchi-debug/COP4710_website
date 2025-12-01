@@ -1,9 +1,9 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { AuthContext } from '../contexts/AuthContext';
+import { useAuth } from '../contexts/AuthContext';
 import axios from 'axios';
 
 const DonorDashboard = () => {
-  const { user } = useContext(AuthContext); // assumes user_id and role are in context
+  const { user } = useAuth(); // assumes user_id and role are in context
   const [offers, setOffers] = useState([]);
   const [reservations, setReservations] = useState([]);
   const [selectedOffers, setSelectedOffers] = useState({});

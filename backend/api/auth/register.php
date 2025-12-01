@@ -40,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $memberType = $input['memberType'];
     $address = isset($input['address']) ? $input['address'] : null;
     $phone = isset($input['phoneNumber']) ? $input['phoneNumber'] : 'N/A';
-    $creditCard = $input['creditCard'] : 'N/A';
+    $creditCard = isset($input['creditCard']) ? $input['creditCard'] : 'N/A';
 
     // Validate based on type
     if (in_array($memberType, ['Customer', 'Donor'])){

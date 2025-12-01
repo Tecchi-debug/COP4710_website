@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 
-function Restaurants() {
+function RestaurantDashboard() {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('dashboard');
   const [dashboardData, setDashboardData] = useState({
@@ -170,21 +170,12 @@ function Restaurants() {
 
   return (
     <div className="site-container">
-      <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+      <div className="dashboard-container">
+        <div className="dashboard-header">
           <h1>Restaurant Dashboard</h1>
           <button
             onClick={() => setShowCreateForm(true)}
-            style={{
-              background: 'var(--accent)',
-              color: 'var(--text)',
-              border: 'none',
-              padding: '0.75rem 1.5rem',
-              borderRadius: '4px',
-              cursor: 'pointer',
-              fontSize: '1rem',
-              fontWeight: 'bold'
-            }}
+            className="btn-create"
             disabled={showCreateForm}
           >
             Create New Offer
@@ -192,12 +183,7 @@ function Restaurants() {
         </div>
 
         {/* Tab Navigation */}
-        <div style={{ 
-          display: 'flex', 
-          gap: '0.5rem', 
-          marginBottom: '2rem',
-          borderBottom: '2px solid var(--nav)'
-        }}>
+        <div className="tab-navigation">
           {[
             { key: 'dashboard', label: 'Dashboard' },
             { key: 'offers', label: 'My Offers' },
@@ -214,32 +200,20 @@ function Restaurants() {
         </div>
 
         {error && (
-          <div style={{ 
-            background: '#ff4444', 
-            color: 'white', 
-            padding: '0.75rem', 
-            borderRadius: '4px', 
-            marginBottom: '1rem' 
-          }}>
+          <div className="alert alert-error">
             {error}
           </div>
         )}
 
         {success && (
-          <div style={{ 
-            background: '#4caf50', 
-            color: 'white', 
-            padding: '0.75rem', 
-            borderRadius: '4px', 
-            marginBottom: '1rem' 
-          }}>
+          <div className="alert alert-success">
             {success}
           </div>
         )}
 
         {/* Create Offer Form */}
         {showCreateForm && (
-          <div id="login-box" style={{ marginBottom: '2rem' }}>
+          <div id="login-box" className="create-offer-form">
             <h3>Create New Offer</h3>
             <form onSubmit={handleCreateOffer}>
               <div className="form-group">
@@ -262,17 +236,7 @@ function Restaurants() {
                   name="plate_description"
                   value={formData.plate_description}
                   onChange={handleInputChange}
-                  style={{
-                    width: '100%',
-                    padding: '0.5rem',
-                    border: '1px solid #ccc',
-                    borderRadius: '4px',
-                    background: 'var(--bg)',
-                    color: 'var(--text)',
-                    boxSizing: 'border-box',
-                    minHeight: '80px',
-                    fontFamily: 'inherit'
-                  }}
+                  className="form-textarea"
                   placeholder="Describe the plate..."
                 />
               </div>
@@ -334,29 +298,11 @@ function Restaurants() {
                 </div>
               </div>
 
-              <div style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem' }}>
-                <button type="submit" style={{
-                  flex: 1,
-                  background: 'var(--accent)',
-                  color: 'var(--text)',
-                  border: 'none',
-                  padding: '0.75rem',
-                  borderRadius: '4px',
-                  cursor: 'pointer',
-                  fontSize: '1rem'
-                }}>
+              <div className="form-actions">
+                <button type="submit" className="btn-save">
                   Create Offer
                 </button>
-                <button type="button" onClick={resetForm} style={{
-                  flex: 1,
-                  background: '#666',
-                  color: 'var(--text)',
-                  border: 'none',
-                  padding: '0.75rem',
-                  borderRadius: '4px',
-                  cursor: 'pointer',
-                  fontSize: '1rem'
-                }}>
+                <button type="button" onClick={resetForm} className="btn-cancel">
                   Cancel
                 </button>
               </div>
@@ -366,7 +312,7 @@ function Restaurants() {
 
         {/* Tab Content */}
         {loading ? (
-          <div style={{ textAlign: 'center', padding: '2rem' }}>
+          <div className="loading-container">
             <h3>Loading...</h3>
           </div>
         ) : (
@@ -375,47 +321,30 @@ function Restaurants() {
             {activeTab === 'dashboard' && (
               <div>
                 {/* Summary Cards */}
-                <div style={{ 
-                  display: 'grid', 
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', 
-                  gap: '1rem', 
-                  marginBottom: '2rem' 
-                }}>
-                  <div style={{
-                    background: 'var(--nav)',
-                    padding: '1.5rem',
-                    borderRadius: '8px',
-                    border: '1px solid rgba(242,166,65,0.3)',
-                    textAlign: 'center'
-                  }}>
-                    <div className="summary-number" style={{ color: 'var(--accent)' }}>
+                <div className="summary-grid">
+                  <div className="summary-card">
+                    <div className="summary-number accent-color">
                       {dashboardData.summary.total_offers}
                     </div>
                     <div className="summary-label">Total Offers</div>
                   </div>
 
-                  <div style={{
-                    background: 'var(--nav)',
-                    padding: '1.5rem',
-                    borderRadius: '8px',
-                    border: '1px solid rgba(242,166,65,0.3)',
-                    textAlign: 'center'
-                  }}>
-                    <div className="summary-number" style={{ color: '#4caf50' }}>
+                  <div className="summary-card">
+                    <div className="summary-number success-color">
                       {dashboardData.summary.active_offers}
                     </div>
                     <div className="summary-label">Active Offers</div>
                   </div>
 
                   <div className="summary-card">
-                    <div className="summary-number" style={{ color: 'var(--accent)' }}>
+                    <div className="summary-number accent-color">
                       {dashboardData.summary.available_quantity}
                     </div>
                     <div className="summary-label">Available Plates</div>
                   </div>
 
                   <div className="summary-card">
-                    <div className="summary-number" style={{ color: '#ff9800' }}>
+                    <div className="summary-number warning-color">
                       {dashboardData.summary.reserved_quantity}
                     </div>
                     <div className="summary-label">Reserved Plates</div>
@@ -423,35 +352,19 @@ function Restaurants() {
                 </div>
 
                 {/* Recent Offers */}
-                <h3 style={{ color: 'var(--accent)', marginBottom: '1rem' }}>Recent Offers</h3>
+                <h3 className="section-title">Recent Offers</h3>
                 {dashboardData.offers.slice(0, 5).map(offer => {
                   const status = getOfferStatus(offer);
                   return (
-                    <div key={offer.offer_id} style={{
-                      background: 'var(--nav)',
-                      border: '1px solid rgba(242,166,65,0.3)',
-                      borderRadius: '8px',
-                      padding: '1rem',
-                      marginBottom: '1rem',
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center'
-                    }}>
+                    <div key={offer.offer_id} className="offer-card recent-offer">
                       <div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '0.5rem' }}>
-                          <h4 style={{ margin: 0, color: 'var(--accent)' }}>{offer.plate_name}</h4>
-                          <span style={{
-                            background: status.color,
-                            color: 'white',
-                            padding: '0.25rem 0.5rem',
-                            borderRadius: '4px',
-                            fontSize: '0.8rem',
-                            fontWeight: 'bold'
-                          }}>
+                        <div className="offer-header">
+                          <h4 className="offer-title">{offer.plate_name}</h4>
+                          <span className={`offer-status status-${status.text.toLowerCase().replace(' ', '')}`}>
                             {status.text}
                           </span>
                         </div>
-                        <div style={{ color: '#ccc', fontSize: '0.9rem' }}>
+                        <div className="offer-details">
                           ${parseFloat(offer.price).toFixed(2)} • {offer.qty} available • Until {formatDateTime(offer.to_time)}
                         </div>
                       </div>
@@ -470,46 +383,41 @@ function Restaurants() {
                     <p>Create your first offer to start selling surplus plates!</p>
                   </div>
                 ) : (
-                  <div style={{ display: 'grid', gap: '1rem' }}>
+                  <div className="offers-grid">
                     {dashboardData.offers.map(offer => {
                       const status = getOfferStatus(offer);
                       return (
-                        <div key={offer.offer_id} style={{
-                          background: 'var(--nav)',
-                          border: '1px solid rgba(242,166,65,0.3)',
-                          borderRadius: '8px',
-                          padding: '1.5rem'
-                        }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
-                            <h3 style={{ margin: 0, color: 'var(--accent)' }}>{offer.plate_name}</h3>
+                        <div key={offer.offer_id} className="offer-card">
+                          <div className="offer-header">
+                            <h3 className="offer-title">{offer.plate_name}</h3>
                             <span className={`offer-status status-${status.text.toLowerCase().replace(' ', '')}`}>
                               {status.text}
                             </span>
                           </div>
                           
                           {offer.plate_description && (
-                            <p style={{ color: '#ccc', marginBottom: '1rem' }}>{offer.plate_description}</p>
+                            <p className="offer-description">{offer.plate_description}</p>
                           )}
                           
                           <div className="offer-details-grid">
                             <div>
-                              <strong style={{ color: 'var(--accent)' }}>Price:</strong> ${parseFloat(offer.price).toFixed(2)}
+                              <strong className="accent-text">Price:</strong> ${parseFloat(offer.price).toFixed(2)}
                             </div>
                             <div>
-                              <strong style={{ color: 'var(--accent)' }}>Available:</strong> {offer.qty}
+                              <strong className="accent-text">Available:</strong> {offer.qty}
                               {offer.reserved_qty > 0 && (
-                                <span style={{ color: '#ff9800' }}> ({offer.reserved_qty} reserved)</span>
+                                <span className="warning-text"> ({offer.reserved_qty} reserved)</span>
                               )}
                             </div>
                             <div>
-                              <strong style={{ color: 'var(--accent)' }}>From:</strong> {formatDateTime(offer.from_time)}
+                              <strong className="accent-text">From:</strong> {formatDateTime(offer.from_time)}
                             </div>
                             <div>
-                              <strong style={{ color: 'var(--accent)' }}>Until:</strong> {formatDateTime(offer.to_time)}
+                              <strong className="accent-text">Until:</strong> {formatDateTime(offer.to_time)}
                             </div>
                             {offer.reservation_count > 0 && (
                               <div>
-                                <strong style={{ color: 'var(--accent)' }}>Reservations:</strong> {offer.reservation_count}
+                                <strong className="accent-text">Reservations:</strong> {offer.reservation_count}
                               </div>
                             )}
                           </div>
@@ -530,37 +438,32 @@ function Restaurants() {
                     <p>Create an offer to add your first plate!</p>
                   </div>
                 ) : (
-                  <div style={{ display: 'grid', gap: '1rem' }}>
+                  <div className="plates-grid">
                     {plates.map(plate => (
                       <div key={plate.plate_id} className="plate-card">
                         <div>
-                          <h3 style={{ margin: 0, marginBottom: '0.5rem', color: 'var(--accent)' }}>{plate.plate_name}</h3>
+                          <h3 className="plate-title">{plate.plate_name}</h3>
                           
                           {plate.plate_description && (
-                            <p style={{ color: '#ccc', marginBottom: '1rem' }}>{plate.plate_description}</p>
+                            <p className="plate-description">{plate.plate_description}</p>
                           )}
                           
-                          <div style={{ 
-                            display: 'grid', 
-                            gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', 
-                            gap: '1rem', 
-                            fontSize: '0.9rem' 
-                          }}>
+                          <div className="plate-details-grid">
                             <div>
-                              <strong style={{ color: 'var(--accent)' }}>Total Offers:</strong> {plate.total_offers}
+                              <strong className="accent-text">Total Offers:</strong> {plate.total_offers}
                             </div>
                             <div>
-                              <strong style={{ color: 'var(--accent)' }}>Available:</strong> {plate.available_qty}
+                              <strong className="accent-text">Available:</strong> {plate.available_qty}
                             </div>
                             <div>
-                              <strong style={{ color: 'var(--accent)' }}>Price Range:</strong> 
+                              <strong className="accent-text">Price Range:</strong> 
                               {plate.min_price === plate.max_price 
                                 ? ` $${parseFloat(plate.min_price).toFixed(2)}`
                                 : ` $${parseFloat(plate.min_price).toFixed(2)} - $${parseFloat(plate.max_price).toFixed(2)}`
                               }
                             </div>
                             <div>
-                              <strong style={{ color: 'var(--accent)' }}>Last Offered:</strong> {formatDateTime(plate.last_offered)}
+                              <strong className="accent-text">Last Offered:</strong> {formatDateTime(plate.last_offered)}
                             </div>
                           </div>
                         </div>
@@ -568,16 +471,7 @@ function Restaurants() {
                         <button
                           onClick={() => fillFormWithPlate(plate)}
                           disabled={showCreateForm}
-                          style={{
-                            background: 'var(--accent)',
-                            color: 'var(--text)',
-                            border: 'none',
-                            padding: '0.5rem 1rem',
-                            borderRadius: '4px',
-                            cursor: 'pointer',
-                            fontSize: '0.9rem',
-                            whiteSpace: 'nowrap'
-                          }}
+                          className="btn-create btn-compact"
                         >
                           Create New Offer
                         </button>
@@ -594,4 +488,4 @@ function Restaurants() {
   );
 }
 
-export default Restaurants;
+export default RestaurantDashboard;

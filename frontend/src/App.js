@@ -7,7 +7,7 @@ import Home from './components/Home';
 import Login from './components/Login';
 import Register from './components/Register';
 import Profile from './components/Profile';
-import Restaurants from './components/Restaurants';
+import RestaurantDashboard from './components/RestaurantDashboard';
 import Admin from './components/Admin';
 import CustomerDashboard from "./components/CustomerDashboard";
 import DonorDashboard from "./components/DonorDashboard";
@@ -32,45 +32,49 @@ return (
                             </ProtectedRoute>
                         } 
                     />
+
                     <Route 
-                        path="/restaurants" 
+                        path="/RestaurantDashboard" 
                         element={
                             <ProtectedRoute requiredRole="Restaurant">
-                                <Restaurants />
+                                <RestaurantDashboard />
+                            </ProtectedRoute>
+                        } 
+                    />
+
+                    <Route 
+                        path="/DonorDashboard" 
+                        element={
+                            <ProtectedRoute requiredRole="Donor">
+                                <DonorDashboard />
                             </ProtectedRoute>
                         } 
                     />
                     <Route 
-                        path="/admin" 
+                        path="/CustomerDashboard" 
+                        element={
+                            <ProtectedRoute requiredRole="Customer">
+                                <CustomerDashboard />
+                            </ProtectedRoute>
+                        } 
+                    />
+
+                    <Route 
+                        path="/NeedyDashboard" 
+                        element={
+                            <ProtectedRoute requiredRole="Needy">
+                                <NeedyDashboard />
+                            </ProtectedRoute>
+                        } 
+                    />
+
+                    <Route 
+                        path="Admin" 
                         element={
                             <ProtectedRoute requiredRole="Administrator">
                                 <Admin />
                             </ProtectedRoute>
                         } 
-                    />
-                    <Route
-                        path="/customer"
-                        element={
-                            <ProtectedRoute>
-                                <CustomerDashboard />
-                            </ProtectedRoute>
-                        }
-                    />
-                    <Route
-                        path="/donor"
-                        element={
-                            <ProtectedRoute>
-                                <DonorDashboard />
-                            </ProtectedRoute>
-                        }
-                    />
-                    <Route
-                        path="/needy"
-                        element={
-                            <ProtectedRoute>
-                                <NeedyDashboard />
-                            </ProtectedRoute>
-                        }
                     />
                 </Routes>
             </div>

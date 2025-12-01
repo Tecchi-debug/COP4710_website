@@ -535,13 +535,165 @@ button:disabled {
   color: #ccc;
 }
 
+/* Additional Restaurant Dashboard Styles */
+.dashboard-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.tab-navigation {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+  border-bottom: 2px solid var(--nav);
+}
+
+.create-offer-form {
+  margin-bottom: 2rem;
+}
+
+.form-textarea {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: var(--bg);
+  color: var(--text);
+  box-sizing: border-box;
+  min-height: 80px;
+  font-family: inherit;
+  resize: vertical;
+}
+
+.form-textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.loading-container {
+  text-align: center;
+  padding: 2rem;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.offers-grid,
+.plates-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.recent-offer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.offer-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.offer-title,
+.plate-title {
+  margin: 0;
+  color: var(--accent);
+}
+
+.offer-title {
+  margin-bottom: 0.5rem;
+}
+
+.plate-title {
+  margin-bottom: 0.5rem;
+}
+
+.offer-description,
+.plate-description {
+  color: #ccc;
+  margin-bottom: 1rem;
+}
+
+.offer-details {
+  color: #ccc;
+  font-size: 0.9rem;
+}
+
+.plate-details-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+  font-size: 0.9rem;
+}
+
+.section-title {
+  color: var(--accent);
+  margin-bottom: 1rem;
+}
+
+.btn-compact {
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+/* Color utility classes */
+.accent-color {
+  color: var(--accent);
+}
+
+.success-color {
+  color: #4caf50;
+}
+
+.warning-color {
+  color: #ff9800;
+}
+
+.accent-text {
+  color: var(--accent);
+}
+
+.warning-text {
+  color: #ff9800;
+}
+
+/* Alert styles */
+.alert-success {
+  background: #4caf50;
+  color: white;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .form-grid-2col {
     grid-template-columns: 1fr;
   }
   
-  .offer-details-grid {
+  .offer-details-grid,
+  .plate-details-grid {
     grid-template-columns: 1fr;
   }
   
@@ -555,5 +707,23 @@ button:disabled {
   
   .summary-number {
     font-size: 1.5rem;
+  }
+  
+  .dashboard-header {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: stretch;
+  }
+  
+  .recent-offer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .offer-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
   }
 }
