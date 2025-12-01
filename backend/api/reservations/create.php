@@ -72,12 +72,14 @@ try {
     // Start transaction (reservation + quantity update must be atomic)
     $pdo->beginTransaction();
 
+    $reserved_for_id = $input['reserved_for_id'] ?? null;
+
     // STEP 2: Insert reservation
     $stmt = $pdo->prepare("
         INSERT INTO reservations (reserved_by_id, reserved_for_id, offer_id, qty, status)
         VALUES (?, NULL, ?, ?, 'PENDING')
     ");
-    $stmt->execute([$reserved_by_id, $offer_id, $qty_requested]);
+    $stmt->execute([$reserved_by_id, $reserved_for_id, $offer_id, $qty_requested]);
 
     $reservation_id = $pdo->lastInsertId();
 
