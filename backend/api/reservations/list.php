@@ -43,6 +43,7 @@ try {
             SELECT
                 r.reservation_id,
                 p.name AS plate_name,
+                p.description AS description,
                 o.price AS price,
                 r.qty AS qty,
                 r.status,
@@ -51,9 +52,9 @@ try {
             FROM reservations r
             JOIN offers o ON r.offer_id = o.offer_id
             JOIN plates p ON o.plate_id = p.plate_id
-            JOIN restaurants rest on o.restaurant_id = rest.user_id
+            JOIN restaurants rest ON o.restaurant_id = rest.user_id
             JOIN users restu ON rest.user_id = restu.user_id
-            WHERE r.reserved_for_id = ?
+            WHERE r.status = 'PENDING' AND (r.reserved_for_id = ? OR r.reserved_for_id IS NULL)
             ORDER BY r.reservation_id DESC
         ";
         $params = [$user_id];
@@ -80,7 +81,7 @@ try {
     }
 
     $stmt = $pdo->prepare($sql);
-    $stmt->execute([$params]);
+    $stmt->execute($params);
     $reservations = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     echo json_encode([
