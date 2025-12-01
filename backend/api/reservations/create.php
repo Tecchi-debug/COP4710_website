@@ -77,7 +77,7 @@ try {
     // STEP 2: Insert reservation
     $stmt = $pdo->prepare("
         INSERT INTO reservations (reserved_by_id, reserved_for_id, offer_id, qty, status)
-        VALUES (?, NULL, ?, ?, 'PENDING')
+        VALUES (?, ?, ?, ?, 'PENDING')
     ");
     $stmt->execute([$reserved_by_id, $reserved_for_id, $offer_id, $qty_requested]);
 
