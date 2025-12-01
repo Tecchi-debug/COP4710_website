@@ -40,30 +40,26 @@ function Login() {
                         user_type: data.user_type
                     });
 
-
-
-                    navigate('/');
-                    // Redirect based on user type
-                    //   const userType = data.user_type || data.memberType;
-                    //   switch (userType) {
-                    //     case 'Administrator':
-                    //       navigate('/admin');
-                    //       break;
-                    //     case 'Restaurant':
-                    //       navigate('/restaurant-dashboard');
-                    //       break;
-                    //     case 'Customer':
-                    //       navigate('/customer-dashboard');
-                    //       break;
-                    //     case 'Donor':
-                    //       navigate('/donor-dashboard');
-                    //       break;
-                    //     case 'Needy':
-                    //       navigate('/needy-dashboard');
-                    //       break;
-                    //     default:
-                    //       navigate('/'); // Default home page
-                    //   }
+                    const userType = data.user_type || data.memberType;
+                    switch (userType) {
+                    case 'Administrator':
+                        navigate('/Admin');
+                        break;
+                    case 'Restaurant':
+                        navigate('/RestaurantDashboard');
+                        break;
+                    case 'Customer':
+                        navigate('/CustomerDashboard');
+                        break;
+                    case 'Donor':
+                        navigate('/DonorDashboard');
+                        break;
+                    case 'Needy':
+                        navigate('/NeedyDashboard');
+                        break;
+                    default:
+                        navigate('/'); // Default home page
+                    }
 
                 } else {
                     setError(data.error || 'Login failed');
