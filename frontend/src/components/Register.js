@@ -16,7 +16,8 @@ function Register() {
   const handleSubmit = (e) => {
     e.preventDefault();
     const phoneValue = phoneNumber || 'N/A';
-    const userData = { username, address,email, password, memberType, phoneNumber: phoneValue };
+    const cardValue = creditCard || 'N/A';
+    const userData = { username, address,email, password, memberType, phoneNumber: phoneValue, creditCard: cardValue };
     console.log('Register:', userData);
 
     fetch('http://localhost/cop4710_website/backend/api/auth/register.php', {
@@ -48,8 +49,9 @@ function Register() {
 
   };
 
-  // Determine if phone number should be shown
+  // Determine if phone number and credit card should be shown
   const showPhoneField = ['Restaurant', 'Donor', 'Customer'].includes(memberType);
+  const showCardField = ['Customer', 'Donor'].includes(memberType);
 
   return (
     <div id="login-box">
@@ -127,6 +129,19 @@ function Register() {
               id="phone_number"
               value={phoneNumber}
               onChange={(e) => setPhoneNumber(e.target.value)}
+            />
+          </div>
+        )}
+
+        {showCardField && (
+          <div className="form-group">
+            <label htmlFor="credit_card">Credit Card:</label>
+            <input
+              type="text"
+              id="credit_card"
+              value={creditCard}
+              onChange={(e) => setCreditCard(e.target.value)}
+              required
             />
           </div>
         )}
