@@ -8,6 +8,7 @@ import Login from './components/Login';
 import Register from './components/Register';
 import Restaurants from './components/Restaurants';
 import Admin from './components/Admin';
+import CustomerDashboard from "./components/CustomerDashboard";
 import './App.css';
 
 function App() {
