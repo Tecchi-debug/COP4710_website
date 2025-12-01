@@ -3,95 +3,111 @@ import { useAuth } from '../contexts/AuthContext';
 
 function RestaurantDashboard() {
   const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState('dashboard');
-  const [dashboardData, setDashboardData] = useState({
-    offers: [],
-    summary: {
-      total_offers: 0,
-      active_offers: 0,
-      available_quantity: 0,
-      reserved_quantity: 0
-    }
-  });
+  const [offers, setOffers] = useState([]);
   const [plates, setPlates] = useState([]);
+  const [restaurantName, setRestaurantName] = useState('');
   const [loading, setLoading] = useState(true);
-  const [showCreateForm, setShowCreateForm] = useState(false);
+  const [showCreateOfferForm, setShowCreateOfferForm] = useState(false);
+  const [showCreatePlateForm, setShowCreatePlateForm] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
   // Form state for creating offers
-  const [formData, setFormData] = useState({
-    plate_name: '',
-    plate_description: '',
+  const [offerData, setOfferData] = useState({
+    plate_id: '',
     price: '',
     qty: '',
     from_time: '',
     to_time: ''
   });
 
-  const fetchDashboardData = useCallback(async () => {
+  // Form state for creating plates
+  const [plateData, setPlateData] = useState({
+    plate_name: '',
+    plate_description: ''
+  });
+
+  const fetchRestaurantData = useCallback(async () => {
     if (!user?.userId) return;
     
     try {
       setLoading(true);
-      const response = await fetch(`http://localhost/cop4710_website/backend/api/restaurant/dashboard.php?restaurant_id=${user.userId}`);
-      const data = await response.json();
       
-      if (data.success) {
-        setDashboardData(data);
-        setError('');
+      // Fetch restaurant name
+      const userResponse = await fetch(`http://localhost/cop4710_website/backend/api/profile/get.php?user_id=${user.userId}`);
+      const userData = await userResponse.json();
+      if (userData.success && userData.user) {
+        setRestaurantName(userData.user.name || userData.user.username || user.username || 'Restaurant');
       } else {
-        setError(data.error || 'Failed to load dashboard data');
+        setRestaurantName(user.username || 'Restaurant');
       }
+
+      // Fetch offers
+      const offersResponse = await fetch(`http://localhost/cop4710_website/backend/api/restaurant/dashboard.php?restaurant_id=${user.userId}`);
+      const offersData = await offersResponse.json();
+      if (offersData.success) {
+        setOffers(offersData.offers || []);
+      }
+
+      // Fetch plates
+      const platesResponse = await fetch(`http://localhost/cop4710_website/backend/api/restaurant/plates.php?restaurant_id=${user.userId}`);
+      const platesData = await platesResponse.json();
+      console.log('Plates API response:', platesData);
+      if (platesData.success) {
+        setPlates(platesData.plates || []);
+        console.log('Plates loaded:', platesData.plates?.length || 0);
+      } else {
+        console.error('Plates API error:', platesData.error);
+      }
+      
+      setError('');
     } catch (err) {
-      console.error('Error fetching dashboard:', err);
+      console.error('Error fetching data:', err);
       setError('Network error. Please try again.');
     } finally {
       setLoading(false);
     }
   }, [user?.userId]);
 
-  const fetchPlates = useCallback(async () => {
-    if (!user?.userId) return;
-    
-    try {
-      const response = await fetch(`http://localhost/cop4710_website/backend/api/restaurant/plates.php?restaurant_id=${user.userId}`);
-      const data = await response.json();
-      
-      if (data.success) {
-        setPlates(data.plates);
-      } else {
-        setError(data.error || 'Failed to load plates');
-      }
-    } catch (err) {
-      console.error('Error fetching plates:', err);
-      setError('Network error. Please try again.');
-    }
-  }, [user?.userId]);
-
   useEffect(() => {
-    fetchDashboardData();
-    fetchPlates();
-  }, [fetchDashboardData, fetchPlates]);
+    fetchRestaurantData();
+  }, [fetchRestaurantData]);
 
-  const handleInputChange = (e) => {
+  const handleOfferInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setOfferData(prev => ({
       ...prev,
       [name]: value
     }));
   };
 
-  const resetForm = () => {
-    setFormData({
-      plate_name: '',
-      plate_description: '',
+  const handlePlateInputChange = (e) => {
+    const { name, value } = e.target;
+    setPlateData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const resetOfferForm = () => {
+    setOfferData({
+      plate_id: '',
       price: '',
       qty: '',
       from_time: '',
       to_time: ''
     });
-    setShowCreateForm(false);
+    setShowCreateOfferForm(false);
+    setError('');
+    setSuccess('');
+  };
+
+  const resetPlateForm = () => {
+    setPlateData({
+      plate_name: '',
+      plate_description: ''
+    });
+    setShowCreatePlateForm(false);
     setError('');
     setSuccess('');
   };
@@ -106,7 +122,7 @@ function RestaurantDashboard() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          ...formData,
+          ...offerData,
           restaurant_id: user.userId
         }),
       });
@@ -115,14 +131,43 @@ function RestaurantDashboard() {
       
       if (data.success) {
         setSuccess('Offer created successfully!');
-        resetForm();
-        fetchDashboardData();
-        fetchPlates();
+        resetOfferForm();
+        fetchRestaurantData();
       } else {
         setError(data.error || 'Failed to create offer');
       }
     } catch (err) {
       console.error('Error creating offer:', err);
+      setError('Network error. Please try again.');
+    }
+  };
+
+  const handleCreatePlate = async (e) => {
+    e.preventDefault();
+    
+    try {
+      const response = await fetch('http://localhost/cop4710_website/backend/api/restaurant/create-plate.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...plateData,
+          restaurant_id: user.userId
+        }),
+      });
+
+      const data = await response.json();
+      
+      if (data.success) {
+        setSuccess('Plate created successfully!');
+        resetPlateForm();
+        fetchRestaurantData();
+      } else {
+        setError(data.error || 'Failed to create plate');
+      }
+    } catch (err) {
+      console.error('Error creating plate:', err);
       setError('Network error. Please try again.');
     }
   };
@@ -147,15 +192,6 @@ function RestaurantDashboard() {
     return { text: 'INACTIVE', color: '#ff9800' };
   };
 
-  const fillFormWithPlate = (plate) => {
-    setFormData(prev => ({
-      ...prev,
-      plate_name: plate.plate_name,
-      plate_description: plate.plate_description || ''
-    }));
-    setShowCreateForm(true);
-  };
-
   if (!user || user.userType !== 'Restaurant') {
     return (
       <div className="access-denied-container">
@@ -172,31 +208,24 @@ function RestaurantDashboard() {
     <div className="site-container">
       <div className="dashboard-container">
         <div className="dashboard-header">
-          <h1>Restaurant Dashboard</h1>
-          <button
-            onClick={() => setShowCreateForm(true)}
-            className="btn-create"
-            disabled={showCreateForm}
-          >
-            Create New Offer
-          </button>
-        </div>
-
-        {/* Tab Navigation */}
-        <div className="tab-navigation">
-          {[
-            { key: 'dashboard', label: 'Dashboard' },
-            { key: 'offers', label: 'My Offers' },
-            { key: 'plates', label: 'My Plates' }
-          ].map(tab => (
+          <h1>{restaurantName}</h1>
+          <div className="header-actions">
             <button
-              key={tab.key}
-              onClick={() => setActiveTab(tab.key)}
-              className={`dashboard-tab ${activeTab === tab.key ? 'active' : ''}`}
+              onClick={() => setShowCreatePlateForm(true)}
+              className="btn-create btn-secondary"
+              disabled={showCreatePlateForm}
             >
-              {tab.label}
+              Create Plate
             </button>
-          ))}
+            <button
+              onClick={() => setShowCreateOfferForm(true)}
+              className="btn-create"
+              disabled={showCreateOfferForm || plates.length === 0}
+              title={plates.length === 0 ? "Create a plate first" : "Make an offer"}
+            >
+              Make Offer {plates.length === 0 && "(Need plates first)"}
+            </button>
+          </div>
         </div>
 
         {error && (
@@ -211,19 +240,19 @@ function RestaurantDashboard() {
           </div>
         )}
 
-        {/* Create Offer Form */}
-        {showCreateForm && (
-          <div id="login-box" className="create-offer-form">
-            <h3>Create New Offer</h3>
-            <form onSubmit={handleCreateOffer}>
+        {/* Create Plate Form */}
+        {showCreatePlateForm && (
+          <div id="login-box" className="create-plate-form">
+            <h3>Create New Plate</h3>
+            <form onSubmit={handleCreatePlate}>
               <div className="form-group">
                 <label htmlFor="plate_name">Plate Name:</label>
                 <input
                   type="text"
                   id="plate_name"
                   name="plate_name"
-                  value={formData.plate_name}
-                  onChange={handleInputChange}
+                  value={plateData.plate_name}
+                  onChange={handlePlateInputChange}
                   required
                   placeholder="e.g. Margherita Pizza"
                 />
@@ -234,11 +263,47 @@ function RestaurantDashboard() {
                 <textarea
                   id="plate_description"
                   name="plate_description"
-                  value={formData.plate_description}
-                  onChange={handleInputChange}
+                  value={plateData.plate_description}
+                  onChange={handlePlateInputChange}
                   className="form-textarea"
                   placeholder="Describe the plate..."
                 />
+              </div>
+
+              <div className="form-actions">
+                <button type="submit" className="btn-save">
+                  Create Plate
+                </button>
+                <button type="button" onClick={resetPlateForm} className="btn-cancel">
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        )}
+
+        {/* Create Offer Form */}
+        {showCreateOfferForm && (
+          <div id="login-box" className="create-offer-form">
+            <h3>Make New Offer</h3>
+            <form onSubmit={handleCreateOffer}>
+              <div className="form-group">
+                <label htmlFor="plate_id">Select Plate:</label>
+                <select
+                  id="plate_id"
+                  name="plate_id"
+                  value={offerData.plate_id}
+                  onChange={handleOfferInputChange}
+                  className="form-select"
+                  required
+                >
+                  <option value="">Choose a plate...</option>
+                  {plates.map(plate => (
+                    <option key={plate.plate_id} value={plate.plate_id}>
+                      {plate.plate_name} - {plate.plate_description}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               <div className="form-grid-2col">
@@ -248,8 +313,8 @@ function RestaurantDashboard() {
                     type="number"
                     id="price"
                     name="price"
-                    value={formData.price}
-                    onChange={handleInputChange}
+                    value={offerData.price}
+                    onChange={handleOfferInputChange}
                     required
                     step="0.01"
                     min="0.01"
@@ -263,8 +328,8 @@ function RestaurantDashboard() {
                     type="number"
                     id="qty"
                     name="qty"
-                    value={formData.qty}
-                    onChange={handleInputChange}
+                    value={offerData.qty}
+                    onChange={handleOfferInputChange}
                     required
                     min="1"
                     placeholder="1"
@@ -279,8 +344,8 @@ function RestaurantDashboard() {
                     type="datetime-local"
                     id="from_time"
                     name="from_time"
-                    value={formData.from_time}
-                    onChange={handleInputChange}
+                    value={offerData.from_time}
+                    onChange={handleOfferInputChange}
                     required
                   />
                 </div>
@@ -291,8 +356,8 @@ function RestaurantDashboard() {
                     type="datetime-local"
                     id="to_time"
                     name="to_time"
-                    value={formData.to_time}
-                    onChange={handleInputChange}
+                    value={offerData.to_time}
+                    onChange={handleOfferInputChange}
                     required
                   />
                 </div>
@@ -300,9 +365,9 @@ function RestaurantDashboard() {
 
               <div className="form-actions">
                 <button type="submit" className="btn-save">
-                  Create Offer
+                  Make Offer
                 </button>
-                <button type="button" onClick={resetForm} className="btn-cancel">
+                <button type="button" onClick={resetOfferForm} className="btn-cancel">
                   Cancel
                 </button>
               </div>
@@ -310,178 +375,64 @@ function RestaurantDashboard() {
           </div>
         )}
 
-        {/* Tab Content */}
+        {/* Content */}
         {loading ? (
           <div className="loading-container">
             <h3>Loading...</h3>
           </div>
         ) : (
-          <>
-            {/* Dashboard Tab */}
-            {activeTab === 'dashboard' && (
-              <div>
-                {/* Summary Cards */}
-                <div className="summary-grid">
-                  <div className="summary-card">
-                    <div className="summary-number accent-color">
-                      {dashboardData.summary.total_offers}
-                    </div>
-                    <div className="summary-label">Total Offers</div>
-                  </div>
-
-                  <div className="summary-card">
-                    <div className="summary-number success-color">
-                      {dashboardData.summary.active_offers}
-                    </div>
-                    <div className="summary-label">Active Offers</div>
-                  </div>
-
-                  <div className="summary-card">
-                    <div className="summary-number accent-color">
-                      {dashboardData.summary.available_quantity}
-                    </div>
-                    <div className="summary-label">Available Plates</div>
-                  </div>
-
-                  <div className="summary-card">
-                    <div className="summary-number warning-color">
-                      {dashboardData.summary.reserved_quantity}
-                    </div>
-                    <div className="summary-label">Reserved Plates</div>
-                  </div>
-                </div>
-
-                {/* Recent Offers */}
-                <h3 className="section-title">Recent Offers</h3>
-                {dashboardData.offers.slice(0, 5).map(offer => {
+          <div>
+            <h2 className="section-title">Current Offers</h2>
+            {offers.length === 0 ? (
+              <div className="empty-state">
+                <h3>No offers yet</h3>
+                <p>Create your first plate and then make an offer!</p>
+              </div>
+            ) : (
+              <div className="offers-list">
+                {offers.map(offer => {
                   const status = getOfferStatus(offer);
                   return (
-                    <div key={offer.offer_id} className="offer-card recent-offer">
-                      <div>
-                        <div className="offer-header">
-                          <h4 className="offer-title">{offer.plate_name}</h4>
-                          <span className={`offer-status status-${status.text.toLowerCase().replace(' ', '')}`}>
-                            {status.text}
-                          </span>
+                    <div key={offer.offer_id} className="offer-card">
+                      <div className="offer-header">
+                        <h3 className="offer-title">{offer.plate_name}</h3>
+                        <span className={`offer-status status-${status.text.toLowerCase().replace(' ', '')}`}>
+                          {status.text}
+                        </span>
+                      </div>
+                      
+                      {offer.plate_description && (
+                        <p className="offer-description">{offer.plate_description}</p>
+                      )}
+                      
+                      <div className="offer-details-grid">
+                        <div>
+                          <strong className="accent-text">Price:</strong> ${parseFloat(offer.price).toFixed(2)}
                         </div>
-                        <div className="offer-details">
-                          ${parseFloat(offer.price).toFixed(2)} • {offer.qty} available • Until {formatDateTime(offer.to_time)}
+                        <div>
+                          <strong className="accent-text">Available:</strong> {offer.qty}
+                          {offer.reserved_qty > 0 && (
+                            <span className="warning-text"> ({offer.reserved_qty} reserved)</span>
+                          )}
                         </div>
+                        <div>
+                          <strong className="accent-text">From:</strong> {formatDateTime(offer.from_time)}
+                        </div>
+                        <div>
+                          <strong className="accent-text">Until:</strong> {formatDateTime(offer.to_time)}
+                        </div>
+                        {offer.reservation_count > 0 && (
+                          <div>
+                            <strong className="accent-text">Reservations:</strong> {offer.reservation_count}
+                          </div>
+                        )}
                       </div>
                     </div>
                   );
                 })}
               </div>
             )}
-
-            {/* Offers Tab */}
-            {activeTab === 'offers' && (
-              <div>
-                {dashboardData.offers.length === 0 ? (
-                  <div className="empty-state">
-                    <h3>No offers yet</h3>
-                    <p>Create your first offer to start selling surplus plates!</p>
-                  </div>
-                ) : (
-                  <div className="offers-grid">
-                    {dashboardData.offers.map(offer => {
-                      const status = getOfferStatus(offer);
-                      return (
-                        <div key={offer.offer_id} className="offer-card">
-                          <div className="offer-header">
-                            <h3 className="offer-title">{offer.plate_name}</h3>
-                            <span className={`offer-status status-${status.text.toLowerCase().replace(' ', '')}`}>
-                              {status.text}
-                            </span>
-                          </div>
-                          
-                          {offer.plate_description && (
-                            <p className="offer-description">{offer.plate_description}</p>
-                          )}
-                          
-                          <div className="offer-details-grid">
-                            <div>
-                              <strong className="accent-text">Price:</strong> ${parseFloat(offer.price).toFixed(2)}
-                            </div>
-                            <div>
-                              <strong className="accent-text">Available:</strong> {offer.qty}
-                              {offer.reserved_qty > 0 && (
-                                <span className="warning-text"> ({offer.reserved_qty} reserved)</span>
-                              )}
-                            </div>
-                            <div>
-                              <strong className="accent-text">From:</strong> {formatDateTime(offer.from_time)}
-                            </div>
-                            <div>
-                              <strong className="accent-text">Until:</strong> {formatDateTime(offer.to_time)}
-                            </div>
-                            {offer.reservation_count > 0 && (
-                              <div>
-                                <strong className="accent-text">Reservations:</strong> {offer.reservation_count}
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* Plates Tab */}
-            {activeTab === 'plates' && (
-              <div>
-                {plates.length === 0 ? (
-                  <div className="empty-state">
-                    <h3>No plates yet</h3>
-                    <p>Create an offer to add your first plate!</p>
-                  </div>
-                ) : (
-                  <div className="plates-grid">
-                    {plates.map(plate => (
-                      <div key={plate.plate_id} className="plate-card">
-                        <div>
-                          <h3 className="plate-title">{plate.plate_name}</h3>
-                          
-                          {plate.plate_description && (
-                            <p className="plate-description">{plate.plate_description}</p>
-                          )}
-                          
-                          <div className="plate-details-grid">
-                            <div>
-                              <strong className="accent-text">Total Offers:</strong> {plate.total_offers}
-                            </div>
-                            <div>
-                              <strong className="accent-text">Available:</strong> {plate.available_qty}
-                            </div>
-                            <div>
-                              <strong className="accent-text">Price Range:</strong> 
-                              {plate.min_price === plate.max_price 
-                                ? ` $${parseFloat(plate.min_price).toFixed(2)}`
-                                : ` $${parseFloat(plate.min_price).toFixed(2)} - $${parseFloat(plate.max_price).toFixed(2)}`
-                              }
-                            </div>
-                            <div>
-                              <strong className="accent-text">Last Offered:</strong> {formatDateTime(plate.last_offered)}
-                            </div>
-                          </div>
-                        </div>
-                        
-                        <button
-                          onClick={() => fillFormWithPlate(plate)}
-                          disabled={showCreateForm}
-                          className="btn-create btn-compact"
-                        >
-                          Create New Offer
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
-          </>
+          </div>
         )}
       </div>
     </div>

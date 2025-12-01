@@ -12,21 +12,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     }
     
     try {
-        // Get all unique plates that this restaurant has created offers for
+        // First, let's get all plates (for now, we'll return all plates since we don't have a restaurant_id field in plates table)
+        // TODO: Add restaurant_id to plates table for proper filtering
         $sql = "
-            SELECT DISTINCT
+            SELECT 
                 p.plate_id,
                 p.name as plate_name,
                 p.description as plate_description,
-                COUNT(o.offer_id) as total_offers,
-                SUM(CASE WHEN o.qty > 0 AND o.to_time > NOW() THEN o.qty ELSE 0 END) as available_qty,
-                MAX(o.from_time) as last_offered,
-                MIN(o.price) as min_price,
-                MAX(o.price) as max_price
+                COALESCE(stats.total_offers, 0) as total_offers,
+                COALESCE(stats.available_qty, 0) as available_qty,
+                stats.last_offered,
+                stats.min_price,
+                stats.max_price
             FROM plates p
-            INNER JOIN offers o ON p.plate_id = o.plate_id
-            WHERE o.restaurant_id = ?
-            GROUP BY p.plate_id, p.name, p.description
+            LEFT JOIN (
+                SELECT 
+                    plate_id,
+                    COUNT(offer_id) as total_offers,
+                    SUM(CASE WHEN qty > 0 AND to_time > NOW() THEN qty ELSE 0 END) as available_qty,
+                    MAX(from_time) as last_offered,
+                    MIN(price) as min_price,
+                    MAX(price) as max_price
+                FROM offers
+                WHERE restaurant_id = ?
+                GROUP BY plate_id
+            ) stats ON p.plate_id = stats.plate_id
             ORDER BY p.name ASC
         ";
 

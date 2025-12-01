@@ -6,15 +6,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $input = json_decode(file_get_contents('php://input'), true);
     
     $restaurantId = $input['restaurant_id'] ?? null;
-    $plateName = trim($input['plate_name'] ?? '');
-    $plateDescription = trim($input['plate_description'] ?? '');
+    $plateId = $input['plate_id'] ?? null;
     $price = $input['price'] ?? null;
     $qty = $input['qty'] ?? null;
     $fromTime = $input['from_time'] ?? null;
     $toTime = $input['to_time'] ?? null;
     
     // Validate required fields
-    if (!$restaurantId || !$plateName || !$price || !$qty || !$fromTime || !$toTime) {
+    if (!$restaurantId || !$plateId || !$price || !$qty || !$fromTime || !$toTime) {
         http_response_code(400);
         echo json_encode(['error' => 'All fields are required']);
         exit;
@@ -57,25 +56,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     
     try {
-        $pdo->beginTransaction();
-        
-        // Create or find the plate
-        $stmt = $pdo->prepare("SELECT plate_id FROM plates WHERE name = ?");
-        $stmt->execute([$plateName]);
-        $existingPlate = $stmt->fetch();
-        
-        if ($existingPlate) {
-            $plateId = $existingPlate['plate_id'];
-            // Update description if provided
-            if (!empty($plateDescription)) {
-                $stmt = $pdo->prepare("UPDATE plates SET description = ? WHERE plate_id = ?");
-                $stmt->execute([$plateDescription, $plateId]);
-            }
-        } else {
-            // Create new plate
-            $stmt = $pdo->prepare("INSERT INTO plates (name, description) VALUES (?, ?)");
-            $stmt->execute([$plateName, $plateDescription ?: null]);
-            $plateId = $pdo->lastInsertId();
+        // Validate that the plate exists and belongs to this restaurant (or is available to all)
+        $stmt = $pdo->prepare("SELECT plate_id FROM plates WHERE plate_id = ?");
+        $stmt->execute([$plateId]);
+        if (!$stmt->fetch()) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Invalid plate selected']);
+            exit;
         }
         
         // Create the offer
@@ -93,7 +80,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ]);
         
         $offerId = $pdo->lastInsertId();
-        $pdo->commit();
         
         echo json_encode([
             'success' => true, 
@@ -102,7 +88,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ]);
         
     } catch (PDOException $e) {
-        $pdo->rollBack();
         error_log("Offer creation error: " . $e->getMessage());
         http_response_code(500);
         echo json_encode(['error' => 'Database error occurred']);

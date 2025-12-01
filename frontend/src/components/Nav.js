@@ -23,7 +23,7 @@ function Nav() {
     const userType = getUserType();
     switch (userType) {
       case 'Administrator':
-        return '/A';
+        return '/Admin';
       case 'Restaurant':
         return '/RestaurantDashboard';
       case 'Customer':
@@ -41,12 +41,7 @@ function Nav() {
     <nav className="nav-container">
       <div className="nav-left">
         <Link to="/">Home</Link>
-        {isAuthenticated && getUserType() === 'Restaurant' && (
-          <Link to="/Restaurants">Make Offers</Link>
-        )}
-        {isAuthenticated && getUserType() === 'Administrator' && (
-          <Link to="/admin">Admin</Link>
-        )}
+
       </div>
       
       <div className="nav-right">
