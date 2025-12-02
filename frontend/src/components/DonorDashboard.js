@@ -43,23 +43,32 @@ const DonorDashboard = () => {
     }));
   };
 
-  // Make reservations
-  const handleReserve = async () => {
+  // Make reservation
+  const reserveOffer = async (offerId) => {
+    if (!user || !user.userId) return;
+    
     try {
-      for (const offer_id of Object.keys(selectedOffers)) {
-        await axios.post(`${API_BASE}/reservations/create.php`, {
-          reserved_by_id: user.user_id,
-          reserved_for_id: null, // donor donating, not picking up
-          offer_id: offer_id,
-          qty: selectedOffers[offer_id],
-        });
+      const res = await fetch(`${API_BASE}/reservations/create.php`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          reserved_by_id: user.userId,
+          reserved_for_id: null, // donation
+          offer_id: offerId,
+          qty: 1
+        }),
+      });
+
+      const data = await res.json();
+      if (!data.success) {
+        alert("Failed to reserve.");
+        return;
       }
-      setSelectedOffers({});
-      fetchReservations();
-      alert('Selected offers reserved for donation!');
+
+      alert("Reservation created!");
+      loadReservations();
     } catch (err) {
-      console.error('Error creating reservation:', err);
-      alert('Failed to reserve offers.');
+      alert("Error creating reservation.");
     }
   };
 
