@@ -3,10 +3,12 @@ import { useAuth } from '../contexts/AuthContext';
 import axios from 'axios';
 
 const DonorDashboard = () => {
-  const { user } = useAuth(); // assumes user_id and role are in context
+  const { user, loading: authLoading } = useAuth(); // use loading flag
   const [offers, setOffers] = useState([]);
   const [reservations, setReservations] = useState([]);
   const [selectedOffers, setSelectedOffers] = useState({});
+  const [loadingRes, setLoadingRes] = useState(true);
+  const [error, setError] = useState(null);
 
   const API_BASE = "http://localhost/COP4710_website/backend/api";
 
