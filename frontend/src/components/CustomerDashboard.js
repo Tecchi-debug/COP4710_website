@@ -10,10 +10,12 @@ function CustomerDashboard() {
   const [error, setError] = useState(null);
   
   // Load available offers
+  const API_BASE = "http://localhost/COP4710_website/backend/api";
+  
   const loadOffers = async () => {
     try {
       setLoadingOffers(true);
-      const response = await fetch("/api/offers/list.php");
+      const response = await fetch("${API_BASE}/offers/list.php");
       const data = await response.json();
       if (data.success) {
         setOffers(data.offers || []);
