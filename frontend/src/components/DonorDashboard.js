@@ -48,7 +48,7 @@ const DonorDashboard = () => {
 
   useEffect(() => {
     if (!authLoading && user) {
-      loadReservations(); // wait until user is loaded
+      setReservations(); // wait until user is loaded
     }
   }, [authLoading, user]);
 
@@ -95,7 +95,7 @@ const DonorDashboard = () => {
       await axios.post(`${API_BASE}/reservations/checkout.php`, {
         user_id: user.user_id,
       });
-      fetchReservations();
+      loadReservations();
       alert('Donations confirmed!');
     } catch (err) {
       console.error('Checkout error:', err);
@@ -122,7 +122,7 @@ const DonorDashboard = () => {
             </li>
           ))}
         </ul>
-        <button onClick={handleReserve} disabled={Object.keys(selectedOffers).length === 0}>
+        <button onClick={reserveOffer} disabled={Object.keys(selectedOffers).length === 0}>
           Reserve for Donation
         </button>
       </section>
