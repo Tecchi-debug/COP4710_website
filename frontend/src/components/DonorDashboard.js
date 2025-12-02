@@ -20,20 +20,35 @@ const DonorDashboard = () => {
     }
   };
 
-  // Fetch donor's reservations
-  const fetchReservations = async () => {
+  // Load user's reservations
+  const loadReservations = async () => {
+    if (!user || !user.userId) return;
+    
     try {
-      const res = await axios.get(`${API_BASE}/reservations/list.php?user_id=${user.user_id}`);
-      setReservations(res.data.reservations || []);
+      setLoadingRes(true);
+      const response = await fetch(`${API_BASE}/reservations/list.php?user_id=${user.userId}`);
+      const data = await response.json();
+      if (data.success) {
+        setReservations(data.reservations || []);
+      } else {
+        setError("Failed to load reservations");
+      }
     } catch (err) {
-      console.error('Error fetching reservations:', err);
+      setError("Error loading reservations");
+    } finally {
+      setLoadingRes(false);
     }
   };
 
   useEffect(() => {
-    fetchOffers();
-    fetchReservations();
+    loadOffers();
   }, []);
+
+  useEffect(() => {
+    if (!authLoading && user) {
+      loadReservations(); // wait until user is loaded
+    }
+  }, [authLoading, user]);
 
   // Handle checkbox toggle
   const toggleSelect = (offer_id) => {
