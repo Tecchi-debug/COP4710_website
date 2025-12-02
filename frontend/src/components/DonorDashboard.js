@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import axios from 'axios';
 
 const DonorDashboard = () => {
   const { user, loading: authLoading } = useAuth(); // use loading flag
@@ -12,16 +11,26 @@ const DonorDashboard = () => {
 
   const API_BASE = "http://localhost/COP4710_website/backend/api";
 
-  // Fetch all active offers
-  const fetchOffers = async () => {
+  // Load available offers
+  const API_BASE = "http://localhost/COP4710_website/backend/api";
+  
+  const loadOffers = async () => {
     try {
-      const res = await axios.get(`${API_BASE}/offers/list.php`);
-      setOffers(res.data.offers || []);
+      setLoadingOffers(true);
+      const response = await fetch(`${API_BASE}/offers/list.php`);
+      const data = await response.json();
+      if (data.success) {
+        setOffers(data.offers || []);
+      } else {
+        setError("Failed to load offers");
+      }
     } catch (err) {
-      console.error('Error fetching offers:', err);
+      setError("Error loading offers");
+    } finally {
+      setLoadingOffers(false);
     }
   };
-
+  
   // Load user's reservations
   const loadReservations = async () => {
     if (!user || !user.userId) return;
