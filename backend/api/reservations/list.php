@@ -49,8 +49,8 @@ try {
         FROM reservations r
         JOIN offers o ON r.offer_id = o.offer_id
         JOIN plates p ON o.plate_id = p.plate_id
-        JOIN restaurants rest ON o.restaurant_id = rest.user_id
-        JOIN users restu ON rest.user_id = restu.user_id
+        LEFT JOIN restaurants rest ON o.restaurant_id = rest.user_id
+        LEFT JOIN users restu ON rest.user_id = restu.user_id
         WHERE (r.reserved_by_id = ? OR r.reserved_for_id = ?)
         ORDER BY r.reservation_id DESC
     ";
