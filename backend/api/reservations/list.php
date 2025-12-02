@@ -36,52 +36,27 @@ try {
         exit;
     }
 
-    // Build SQL depending on role
-    if ($role === "needy") {
-        // Needy users see reservations where they are the recipient
-        $sql = "
-            SELECT
-                r.reservation_id,
-                p.name AS plate_name,
-                p.description AS description,
-                o.price AS price,
-                r.qty AS qty,
-                r.status,
-                restu.name AS restaurant_name,
-                o.offer_id
-            FROM reservations r
-            JOIN offers o ON r.offer_id = o.offer_id
-            JOIN plates p ON o.plate_id = p.plate_id
-            JOIN restaurants rest ON o.restaurant_id = rest.user_id
-            JOIN users restu ON rest.user_id = restu.user_id
-            WHERE r.status = 'PENDING' AND (r.reserved_for_id = ? OR r.reserved_for_id IS NULL)
-            ORDER BY r.reservation_id DESC
-        ";
-        $params = [$user_id];
-    } else {
-        // Customer or donor sees their own reservations
-        $sql = "
-            SELECT
-                r.reservation_id,
-                p.name AS plate_name,
-                o.price AS price,
-                r.qty AS qty,
-                r.status,
-                restu.name AS restaurant_name,
-                o.offer_id
-            FROM reservations r
-            JOIN offers o ON r.offer_id = o.offer_id
-            JOIN plates p ON o.plate_id = p.plate_id
-            JOIN restaurants rest ON o.restaurant_id = rest.user_id
-            JOIN users restu ON rest.user_id = restu.user_id
-            WHERE r.reserved_by_id = ?
-            ORDER BY r.reservation_id DESC
-        ";
-        $params = [$user_id];
-    }
+    $sql = "
+        SELECT
+            r.reservation_id,
+            p.name AS plate_name,
+            p.description AS description,
+            o.price AS price,
+            r.qty AS qty,
+            r.status,
+            restu.name AS restaurant_name,
+            o.offer_id
+        FROM reservations r
+        JOIN offers o ON r.offer_id = o.offer_id
+        JOIN plates p ON o.plate_id = p.plate_id
+        JOIN restaurants rest ON o.restaurant_id = rest.user_id
+        JOIN users restu ON rest.user_id = restu.user_id
+        WHERE (r.reserved_by_id = ? OR r.reserved_for_id = ?)
+        ORDER BY r.reservation_id DESC
+    ";
 
     $stmt = $pdo->prepare($sql);
-    $stmt->execute($params);
+    $stmt->execute([$user_id, $user_id]);
     $reservations = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     echo json_encode([
