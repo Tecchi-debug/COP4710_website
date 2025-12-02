@@ -15,7 +15,7 @@ function CustomerDashboard() {
   const loadOffers = async () => {
     try {
       setLoadingOffers(true);
-      const response = await fetch("${API_BASE}/offers/list.php");
+      const response = await fetch(`${API_BASE}/offers/list.php`);
       const data = await response.json();
       if (data.success) {
         setOffers(data.offers || []);
@@ -33,7 +33,7 @@ function CustomerDashboard() {
   const loadReservations = async () => {
     try {
       setLoadingRes(true);
-      const response = await fetch(`/api/reservations/list.php?user_id=${user.user_id}`);
+      const response = await fetch(`${API_BASE}/reservations/list.php?user_id=${user.user_id}`);
       const data = await response.json();
       if (data.success) {
         setReservations(data.reservations || []);
@@ -55,7 +55,7 @@ function CustomerDashboard() {
   // Make reservation
   const reserveOffer = async (offerId) => {
     try {
-      const res = await fetch("/api/reservations/create.php", {
+      const res = await fetch(`${API_BASE}/reservations/create.php`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -82,7 +82,7 @@ function CustomerDashboard() {
   // Checkout: confirm pending reservations
   const checkout = async () => {
     try {
-      const res = await fetch("/api/reservations/checkout.php", {
+      const res = await fetch("${API_BASE}/reservations/checkout.php", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
