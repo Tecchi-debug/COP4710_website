@@ -8,10 +8,12 @@ const DonorDashboard = () => {
   const [reservations, setReservations] = useState([]);
   const [selectedOffers, setSelectedOffers] = useState({});
 
+  const API_BASE = "http://localhost/COP4710_website/backend/api";
+
   // Fetch all active offers
   const fetchOffers = async () => {
     try {
-      const res = await axios.get('/api/offers/list.php');
+      const res = await axios.get(`${API_BASE}/offers/list.php`);
       setOffers(res.data.offers || []);
     } catch (err) {
       console.error('Error fetching offers:', err);
@@ -21,7 +23,7 @@ const DonorDashboard = () => {
   // Fetch donor's reservations
   const fetchReservations = async () => {
     try {
-      const res = await axios.get(`/api/reservations/list.php?user_id=${user.user_id}`);
+      const res = await axios.get(`${API_BASE}/reservations/list.php?user_id=${user.user_id}`);
       setReservations(res.data.reservations || []);
     } catch (err) {
       console.error('Error fetching reservations:', err);
@@ -45,7 +47,7 @@ const DonorDashboard = () => {
   const handleReserve = async () => {
     try {
       for (const offer_id of Object.keys(selectedOffers)) {
-        await axios.post('/api/reservations/create.php', {
+        await axios.post(`${API_BASE}/reservations/create.php`, {
           reserved_by_id: user.user_id,
           reserved_for_id: null, // donor donating, not picking up
           offer_id: offer_id,
@@ -64,7 +66,7 @@ const DonorDashboard = () => {
   // Simple checkout: mark all pending reservations as CONFIRMED
   const handleCheckout = async () => {
     try {
-      await axios.post('/api/reservations/checkout.php', {
+      await axios.post(`${API_BASE}/reservations/checkout.php`, {
         user_id: user.user_id,
       });
       fetchReservations();
