@@ -31,6 +31,8 @@ function CustomerDashboard() {
 
   // Load user's reservations
   const loadReservations = async () => {
+    if (!user || !user.user_id) return; // wait for user to be loaded
+    
     try {
       setLoadingRes(true);
       const response = await fetch(`${API_BASE}/reservations/list.php?user_id=${user.user_id}`);
@@ -49,11 +51,18 @@ function CustomerDashboard() {
 
   useEffect(() => {
     loadOffers();
-    loadReservations();
   }, []);
+
+  useEffect(() => {
+    if (user) {
+      loadReservations(); // wait until user is loaded
+    }
+  }, [user]);
 
   // Make reservation
   const reserveOffer = async (offerId) => {
+    if (!user || !user.user_id) return;
+    
     try {
       const res = await fetch(`${API_BASE}/reservations/create.php`, {
         method: "POST",
@@ -81,6 +90,8 @@ function CustomerDashboard() {
 
   // Checkout: confirm pending reservations
   const checkout = async () => {
+    if (!user || !user.user_id) return;
+    
     try {
       const res = await fetch(`${API_BASE}/reservations/checkout.php`, {
         method: "POST",
