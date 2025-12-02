@@ -30,7 +30,7 @@ try {
                 AND status = 'PENDING'";
     
     $stmt = $pdo->prepare($sql);
-    $stmt->execute($params);
+    $stmt->execute([$user_id]);
 
     echo json_encode([
         'success' => true,
