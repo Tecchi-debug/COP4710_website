@@ -43,7 +43,7 @@ const DonorDashboard = () => {
   };
 
   useEffect(() => {
-    loadOffers();
+    fetchOffers();
   }, []);
 
   useEffect(() => {
