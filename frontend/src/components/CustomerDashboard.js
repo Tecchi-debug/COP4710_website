@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useAuth } from "../hooks/useAuth";
 
 function CustomerDashboard() {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth(); // use loading flag
   const [offers, setOffers] = useState([]);
   const [reservations, setReservations] = useState([]);
   const [loadingOffers, setLoadingOffers] = useState(true);
@@ -31,7 +31,7 @@ function CustomerDashboard() {
 
   // Load user's reservations
   const loadReservations = async () => {
-    if (!user || !user.user_id) return; // wait for user to be loaded
+    if (!user || !user.user_id) return;
     
     try {
       setLoadingRes(true);
@@ -54,10 +54,10 @@ function CustomerDashboard() {
   }, []);
 
   useEffect(() => {
-    if (user) {
+    if (!authLoading && user) {
       loadReservations(); // wait until user is loaded
     }
-  }, [user]);
+  }, [authLoading, user]);
 
   // Make reservation
   const reserveOffer = async (offerId) => {
