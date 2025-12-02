@@ -82,7 +82,7 @@ function CustomerDashboard() {
   // Checkout: confirm pending reservations
   const checkout = async () => {
     try {
-      const res = await fetch("${API_BASE}/reservations/checkout.php", {
+      const res = await fetch(`${API_BASE}/reservations/checkout.php`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
