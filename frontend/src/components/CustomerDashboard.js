@@ -31,11 +31,11 @@ function CustomerDashboard() {
 
   // Load user's reservations
   const loadReservations = async () => {
-    if (!user || !user.user_id) return;
+    if (!user || !user.userId) return;
     
     try {
       setLoadingRes(true);
-      const response = await fetch(`${API_BASE}/reservations/list.php?user_id=${user.user_id}`);
+      const response = await fetch(`${API_BASE}/reservations/list.php?user_id=${user.userId}`);
       const data = await response.json();
       if (data.success) {
         setReservations(data.reservations || []);
@@ -61,15 +61,15 @@ function CustomerDashboard() {
 
   // Make reservation
   const reserveOffer = async (offerId) => {
-    if (!user || !user.user_id) return;
+    if (!user || !user.userId) return;
     
     try {
       const res = await fetch(`${API_BASE}/reservations/create.php`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          reserved_by_id: user.user_id,
-          reserved_for_id: user.user_id, // customers reserve for themselves
+          reserved_by_id: user.userId,
+          reserved_for_id: user.userId, // customers reserve for themselves
           offer_id: offerId,
           qty: 1
         }),
@@ -90,14 +90,14 @@ function CustomerDashboard() {
 
   // Checkout: confirm pending reservations
   const checkout = async () => {
-    if (!user || !user.user_id) return;
+    if (!user || !user.userId) return;
     
     try {
       const res = await fetch(`${API_BASE}/reservations/checkout.php`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          user_id: user.user_id,
+          user_id: user.userId,
         }),
       });
 
@@ -118,7 +118,7 @@ function CustomerDashboard() {
   return (
     <div style={{ padding: "20px" }}>
       <h1>Customer Dashboard</h1>
-      <p>Welcome, {user?.name}</p>
+      <p>Welcome, {user?.username}</p>
 
       {/* --------------------- Offers --------------------- */}
       <h2>Available Surplus Plates</h2>
