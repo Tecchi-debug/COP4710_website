@@ -1,20 +1,25 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
 
 const NeedyDashboard = () => {
-  const { user } = useAuth(); // current logged-in needy user
+  const { user } = useAuth();
   const [freePlates, setFreePlates] = useState([]);
   const [selectedPlates, setSelectedPlates] = useState([]);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
 
+  const API_BASE = "http://localhost/COP4710_website/backend/api";
+
   useEffect(() => {
-    fetchFreePlates();
-  }, []);
+    if (user) {
+      fetchFreePlates();
+    }
+  }, [user]);
 
   const fetchFreePlates = async () => {
+    if (!user?.userId) return;
     try {
-      const res = await fetch(`/api/reservations/list.php?free=1&user_id=${user.user_id}`);
+      const res = await fetch(`${API_BASE}/reservations/list.php?status=confirmed&donated=1`);
       const data = await res.json();
       if (data.success) {
         setFreePlates(data.reservations);
@@ -44,14 +49,19 @@ const NeedyDashboard = () => {
       alert("Select at least one plate to checkout");
       return;
     }
+    if (!user?.userId) {
+      alert("User not logged in");
+      return;
+    }
     setLoading(true);
     try {
-      const res = await fetch("/api/reservations/checkout.php", {
+      const res = await fetch(`${API_BASE}/reservations/checkout.php`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          user_id: user.user_id,
-          reservation_ids: selectedPlates
+          user_id: user.userId,
+          reservation_ids: selectedPlates,
+          claim_donations: true
         })
       });
       const data = await res.json();

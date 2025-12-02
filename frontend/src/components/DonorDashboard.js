@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 
 const DonorDashboard = () => {
@@ -12,11 +12,8 @@ const DonorDashboard = () => {
   const API_BASE = "http://localhost/COP4710_website/backend/api";
 
   // Load available offers
-  const API_BASE = "http://localhost/COP4710_website/backend/api";
-  
   const loadOffers = async () => {
     try {
-      setLoadingOffers(true);
       const response = await fetch(`${API_BASE}/offers/list.php`);
       const data = await response.json();
       if (data.success) {
@@ -27,7 +24,7 @@ const DonorDashboard = () => {
     } catch (err) {
       setError("Error loading offers");
     } finally {
-      setLoadingOffers(false);
+      // Loading complete
     }
   };
   
@@ -52,12 +49,12 @@ const DonorDashboard = () => {
   };
 
   useEffect(() => {
-    fetchOffers();
+    loadOffers();
   }, []);
 
   useEffect(() => {
     if (!authLoading && user) {
-      setReservations(); // wait until user is loaded
+      loadReservations(); // wait until user is loaded
     }
   }, [authLoading, user]);
 
@@ -69,7 +66,41 @@ const DonorDashboard = () => {
     }));
   };
 
-  // Make reservation
+  // Make reservations for selected offers
+  const handleReserve = async () => {
+    if (!user?.userId) return;
+    
+    const selectedOfferIds = Object.keys(selectedOffers).filter(id => selectedOffers[id] > 0);
+    
+    try {
+      for (const offerId of selectedOfferIds) {
+        const res = await fetch(`${API_BASE}/reservations/create.php`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            reserved_by_id: user.userId,
+            reserved_for_id: null, // donation
+            offer_id: offerId,
+            qty: selectedOffers[offerId]
+          }),
+        });
+
+        const data = await res.json();
+        if (!data.success) {
+          alert(`Failed to reserve offer ${offerId}.`);
+          return;
+        }
+      }
+
+      alert("Reservations created for donation!");
+      setSelectedOffers({}); // Clear selections
+      loadReservations();
+    } catch (err) {
+      alert("Error creating reservations.");
+    }
+  };
+
+  // Make reservation (old function)
   const reserveOffer = async (offerId) => {
     if (!user || !user.userId) return;
     
@@ -100,12 +131,20 @@ const DonorDashboard = () => {
 
   // Simple checkout: mark all pending reservations as CONFIRMED
   const handleCheckout = async () => {
+    if (!user?.userId) return;
     try {
-      await axios.post(`${API_BASE}/reservations/checkout.php`, {
-        user_id: user.user_id,
+      const res = await fetch(`${API_BASE}/reservations/checkout.php`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          user_id: user.userId,
+        }),
       });
-      loadReservations();
-      alert('Donations confirmed!');
+      const data = await res.json();
+      if (data.success) {
+        loadReservations();
+        alert('Donations confirmed!');
+      }
     } catch (err) {
       console.error('Checkout error:', err);
       alert('Checkout failed.');
@@ -131,7 +170,7 @@ const DonorDashboard = () => {
             </li>
           ))}
         </ul>
-        <button onClick={reserveOffer} disabled={Object.keys(selectedOffers).length === 0}>
+        <button onClick={handleReserve} disabled={Object.keys(selectedOffers).filter(id => selectedOffers[id] > 0).length === 0}>
           Reserve for Donation
         </button>
       </section>
