@@ -31,6 +31,7 @@ function CustomerDashboard() {
 
   // Load user's reservations
   const loadReservations = async () => {
+    if (!user?.user_id) return; // Wait until user is loaded
     try {
       setLoadingRes(true);
       const response = await fetch(`${API_BASE}/reservations/list.php?user_id=${user.user_id}`);
@@ -48,12 +49,15 @@ function CustomerDashboard() {
   };
 
   useEffect(() => {
-    loadOffers();
-    loadReservations();
-  }, []);
+    if (user?.user_id) {
+      loadOffers();
+      loadReservations();
+    }
+  }, [user]);
 
   // Make reservation
   const reserveOffer = async (offerId) => {
+    if (!user?.user_id) return;
     try {
       const res = await fetch(`${API_BASE}/reservations/create.php`, {
         method: "POST",
@@ -67,8 +71,9 @@ function CustomerDashboard() {
       });
 
       const data = await res.json();
+      console.log("Reserved response:", data);
       if (!data.success) {
-        alert("Failed to reserve.");
+        alert("Failed to reserve: " + (data.error || ""));
         return;
       }
 
@@ -81,6 +86,7 @@ function CustomerDashboard() {
 
   // Checkout: confirm pending reservations
   const checkout = async () => {
+  if (!user?.user_id || reservations.length === 0) return;
     try {
       const res = await fetch(`${API_BASE}/reservations/checkout.php`, {
         method: "POST",
@@ -91,8 +97,9 @@ function CustomerDashboard() {
       });
 
       const data = await res.json();
+      console.log("Checkout response:", data);
       if (!data.success) {
-        alert("Checkout failed.");
+        alert("Checkout failed: " + (data.error || ""));
         return;
       }
 
