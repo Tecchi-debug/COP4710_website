@@ -3,7 +3,7 @@ require_once '../config/cors.php';
 require_once '../config/database.php';
 
 // Require user_id query parameter
-if (!isset($_GET['user_id'])) {
+if (!isset($_GET['userId'])) {
     http_response_code(400);
     echo json_encode(['success' => false, 'error' => 'Missing user_id']);
     exit;
