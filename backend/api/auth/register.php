@@ -44,13 +44,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Validate based on type
     if (in_array($memberType, ['Customer', 'Donor'])){
-        if (!$creditCard) {
+        if (!$creditCard || $creditCard === 'N/A') {
             http_response_code(400);
             echo json_encode(['error' => 'Credit card required for Customers and Donors']);
             exit;
         }
     }
-    
+
+    if (in_array($memberType, ['Customer', 'Donor','Restaurant'])){
+        if (!$phone || $phone === 'N/A' || trim($phone) === '') {
+            http_response_code(400);
+            echo json_encode(['error' => 'Phone Number required for Customers, Donors and Restaurants']);
+            exit;
+        }
+    }
     try {
         // Check if user already exists with detailed debugging
         $stmt = $pdo->prepare("SELECT user_id, name, email FROM users WHERE name = ? OR email = ?");
