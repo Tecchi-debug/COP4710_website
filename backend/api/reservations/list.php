@@ -88,8 +88,6 @@ if ($role === "needy" && isset($_GET['donated']) && $_GET['donated'] == '1') {
     $stmt->execute([$user_id, $user_id]);
 }
 
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute([$user_id, $user_id]);
     $reservations = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     echo json_encode([
