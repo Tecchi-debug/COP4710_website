@@ -36,6 +36,35 @@ try {
         exit;
     }
 
+    // If needy is requesting donated free plates
+if ($role === "needy" && isset($_GET['donated']) && $_GET['donated'] == '1') {
+
+    // Only confirmed reservations created by donors with no assigned needy yet
+    $sql = "
+        SELECT 
+            r.reservation_id,
+            p.name AS plate_name,
+            p.description AS description,
+            r.qty,
+            r.status,
+            o.offer_id,
+            restu.name AS restaurant_name
+        FROM reservations r
+        JOIN offers o ON r.offer_id = o.offer_id
+        JOIN plates p ON o.plate_id = p.plate_id
+        JOIN donors d ON r.reserved_by_id = d.user_id
+        LEFT JOIN restaurants rest ON o.restaurant_id = rest.user_id
+        LEFT JOIN users restu ON rest.user_id = restu.user_id
+        WHERE r.status = 'CONFIRMED'
+          AND r.reserved_for_id IS NULL
+        ORDER BY r.reservation_id DESC
+    ";
+
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute();
+
+} else {
+    // Existing logic for customers/donors or needy viewing personal history
     $sql = "
         SELECT
             r.reservation_id,
@@ -54,6 +83,10 @@ try {
         WHERE (r.reserved_by_id = ? OR r.reserved_for_id = ?)
         ORDER BY r.reservation_id DESC
     ";
+
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([$user_id, $user_id]);
+}
 
     $stmt = $pdo->prepare($sql);
     $stmt->execute([$user_id, $user_id]);
