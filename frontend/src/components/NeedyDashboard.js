@@ -19,7 +19,7 @@ const NeedyDashboard = () => {
   const fetchFreePlates = async () => {
     if (!user?.userId) return;
     try {
-      const res = await fetch(`${API_BASE}/reservations/list.php?status=confirmed&donated=1`);
+      const res = await fetch(`${API_BASE}/reservations/list.php?user_id=${user.userId}&status=confirmed&donated=1`);
       const data = await res.json();
       if (data.success) {
         setFreePlates(data.reservations);
